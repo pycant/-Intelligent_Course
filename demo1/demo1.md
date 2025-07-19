@@ -28,3 +28,15 @@ AI技术开发：1人
 - 数据库技术：MySQL、MongoDB
 - 素材制作技术：PS、ComfyUI
 
+## 五、工作目录说明
+
+``` dir
+demo1
+│  demo1.md     // 项目介绍
+│
+├─core          // 核心后端代码
+├─docs          // 项目文档及收集内容
+├─static        // 静态资源文件
+│  └─imgs       // 素材图片（需要规范命名）
+└─templates     // 模板文件
+```
