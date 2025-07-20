@@ -1,145 +1,673 @@
-<!-- templates/map.html -->
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>西山万寿宫交互地图</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/konva@8.3.14/konva.min.js"></script>
     <style>
-        #map-container { width: 800px; height: 500px; border: 1px solid #ccc; }
-        .info-panel { position: absolute; right: 20px; top: 20px; background: rgba(255,255,255,0.9); padding: 15px; }
-        .timeline { margin-top: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-button {
+            background: #1890ff;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(24, 144, 255, 0.4);
+        }
+        
+        .nav-button:hover {
+            background: #40a9ff;
+            transform: scale(1.05);
+        }
+        
+        .title-container {
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .map-header {
+            font-size: 1.8rem;
+            color: #1a2980;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .map-subtitle {
+            font-size: 1rem;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        /* 地图容器 */
+        .map-section {
+            display: flex;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+        
+        .map-container {
+            flex: 1;
+            min-width: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+            height: 600px;
+        }
+        
+        #map-canvas {
+            width: 100%;
+            height: 100%;
+            background: #e6f7ff;
+        }
+        
+        /* 信息面板 */
+        .info-panel {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .info-panel h3 {
+            font-size: 1.5rem;
+            color: #1a2980;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .building-info {
+            margin-bottom: 25px;
+        }
+        
+        .building-title {
+            font-size: 1.3rem;
+            color: #1890ff;
+            margin-bottom: 10px;
+        }
+        
+        .building-desc {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .building-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(45deg, #e0f7fa, #bbdefb);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d47a1;
+            overflow: hidden;
+        }
+        
+        .timeline {
+            margin-top: 20px;
+        }
+        
+        .timeline-title {
+            font-size: 1.2rem;
+            color: #1a2980;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-btn {
+            flex: 1;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .timeline-btn:hover {
+            background: #40a9ff;
+            transform: translateY(-2px);
+        }
+        
+        .timeline-btn.active {
+            background: #096dd9;
+            box-shadow: 0 4px 12px rgba(9, 109, 217, 0.3);
+        }
+        
+        .timeline-desc {
+            background: #e6f7ff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* 建筑列表 */
+        .buildings-list {
+            margin-top: 25px;
+        }
+        
+        .buildings-title {
+            font-size: 1.2rem;
+            color: #1a2980;
+            margin-bottom: 15px;
+        }
+        
+        .building-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #1890ff;
+        }
+        
+        .building-item:hover {
+            background: #e6f7ff;
+            transform: translateX(5px);
+        }
+        
+        .building-marker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        
+        .building-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            margin-top: 40px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 加载动画 */
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e0f7fa;
+            border-top: 5px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .map-section {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .info-panel {
+                width: 100%;
+                max-height: 400px;
+            }
+            
+            .map-container {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .map-header {
+                font-size: 1.5rem;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
+            
+            .top-nav {
+                padding: 12px 15px;
+            }
+        }
     </style>
 </head>
 <body>
-        <!-- 添加返回按钮 -->
-    <div class="nav-button" onclick="navigateTo('/')">
-        ←
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="nav-button" onclick="navigateTo('/')">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="title-container">
+            <h1 class="map-header">西山万寿宫交互地图</h1>
+            <p class="map-subtitle">探索千年道教圣地，感受历史文化魅力</p>
+        </div>
+        <div class="nav-button" style="visibility: hidden;">
+            <i class="fas fa-arrow-left"></i>
+        </div>
     </div>
     
-    <!-- 更新标题样式 -->
-    <h1 class="map-header">西山万寿宫交互地图</h1>
-    
-    <!-- 容器添加类名 -->
-    <div id="map-container" class="map-container"></div>
-    
-    <div class="info-panel">
-        <h3 id="building-name">-- 选择建筑 --</h3>
-        <p id="building-desc">点击地图中的建筑查看详情</p>
-            <div class="timeline">
-                <button onclick="showView('modern')">现代风貌</button>
-                <button onclick="showView('qing_dynasty')">清代复原</button>
-                <p id="view-desc">{{ data.history.modern }}</p>
+    <!-- 主内容区 -->
+    <div class="map-section">
+        <!-- 地图容器 -->
+        <div class="map-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>地图加载中，请稍候...</p>
             </div>
+            <div id="map-canvas"></div>
+        </div>
+        
+        <!-- 信息面板 -->
+        <div class="info-panel">
+            <div class="building-info">
+                <h3>建筑信息</h3>
+                <div class="building-title">-- 选择建筑 --</div>
+                <p class="building-desc">点击地图中的建筑标记查看详细信息</p>
+                <div class="building-image">
+                    <div style="text-align: center;">
+                        <i class="fas fa-landmark" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                        <p>点击建筑查看图片</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline">
+                <h4 class="timeline-title">历史视图</h4>
+                <div class="timeline-buttons">
+                    <button class="timeline-btn active" onclick="showView('modern')">现代风貌</button>
+                    <button class="timeline-btn" onclick="showView('qing_dynasty')">清代复原</button>
+                </div>
+                <div class="timeline-desc" id="view-desc">西山万寿宫现代全景（2023年修复后），占地面积约3万平方米，是江南地区规模最大的道教宫观之一。</div>
+            </div>
+            
+            <div class="buildings-list">
+                <h4 class="buildings-title">主要建筑</h4>
+                <div class="building-item" data-id="main_hall">
+                    <div class="building-marker" style="background: gold;"></div>
+                    <div class="building-name">正殿</div>
+                </div>
+                <div class="building-item" data-id="opera_stage">
+                    <div class="building-marker" style="background: green;"></div>
+                    <div class="building-name">戏台</div>
+                </div>
+                <div class="building-item" data-id="incense_burner">
+                    <div class="building-marker" style="background: orange;"></div>
+                    <div class="building-name">香炉</div>
+                </div>
+                <div class="building-item" data-id="bell_tower">
+                    <div class="building-marker" style="background: purple;"></div>
+                    <div class="building-name">钟楼</div>
+                </div>
+                <div class="building-item" data-id="drum_tower">
+                    <div class="building-marker" style="background: teal;"></div>
+                    <div class="building-name">鼓楼</div>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <div class="footer">
+        <p>江西水文化数字课程 © 2023 | 西山万寿宫交互地图</p>
+        <p>技术支持：Konva.js & Flask</p>
+    </div>
+
     <script>
+        // 导航功能
+        function navigateTo(path) {
+            window.location.href = path;
+        }
+        
         // 视图切换功能
         function showView(era) {
             const views = {
-                modern: "{{ data.history.modern }}",
-                qing_dynasty: "{{ data.history.qing_dynasty }}"
+                modern: "西山万寿宫现代全景（2023年修复后），占地面积约3万平方米，是江南地区规模最大的道教宫观之一。",
+                qing_dynasty: "清代万寿宫复原图（1845年《西山宫志》记载），采用典型的清代宫观建筑风格，以红墙黄瓦为主色调，布局严谨对称。"
             };
-            document.getElementById('view-desc').textContent = views[era];
-        }
-
-        // 添加地图加载动画
-        document.addEventListener('DOMContentLoaded', function() {
-            const mapContainer = document.getElementById('map-container');
-            mapContainer.innerHTML = '<div style="text-align:center;padding-top:40%">地图加载中...</div>';
             
+            document.getElementById('view-desc').textContent = views[era];
+            
+            // 更新按钮状态
+            document.querySelectorAll('.timeline-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 初始化地图
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟加载延迟
             setTimeout(() => {
                 initMap();
-            }, 800);
+                document.querySelector('.loading').style.display = 'none';
+            }, 1500);
         });
         
         function initMap() {
-                    // 创建简易地图
-                    const stage = new Konva.Stage({
-                        container: 'map-container',
-                        width: 800,
-                        height: 500
-                    });
-                    const layer = new Konva.Layer();
-                    
-                    // 绘制基础地图（模拟江西地图）
-                    const jiangxiMap = new Konva.Rect({
-                        x: 50,
-                        y: 50,
-                        width: 700,
-                        height: 400,
-                        fill: '#e6f7ff',
-                        stroke: '#1890ff',
-                        strokeWidth: 2
-                    });
-                    
-                    // 标记万寿宫位置
-                    const templeMarker = new Konva.Circle({
-                        x: 400,
-                        y: 200,
-                        radius: 15,
-                        fill: 'red',
-                        stroke: 'black',
-                        strokeWidth: 1,
-                        name: 'temple'
-                    });
-                    
-                    // 添加建筑标记
-                    const buildings = [
-                        {id: 'main_hall', x: 380, y: 180, color: 'gold'},
-                        {id: 'opera_stage', x: 300, y: 220, color: 'green'},
-                        {id: 'incense_burner', x: 350, y: 250, color: 'orange'}
-                    ];
-                    
-                    buildings.forEach(b => {
-                        const building = new Konva.Circle({
-                            x: b.x,
-                            y: b.y,
-                            radius: 8,
-                            fill: b.color,
-                            name: b.id
-                        });
-                        
-                        building.on('click', () => {
-                            fetch(`/get_building/${b.id}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                    document.getElementById('building-name').textContent = data.name;
-                                    document.getElementById('building-desc').textContent = data.desc;
-                                });
-                        });
-                        
-                        layer.add(building);
-                    });
-                    
-                    // 添加交互事件
-                    templeMarker.on('click', () => {
-                        alert('已进入万寿宫区域，可点击具体建筑查看详情');
-                    });
-                    
-                    layer.add(jiangxiMap);
-                    layer.add(templeMarker);
-                    stage.add(layer);
+            const stage = new Konva.Stage({
+                container: 'map-canvas',
+                width: document.querySelector('.map-container').offsetWidth,
+                height: document.querySelector('.map-container').offsetHeight
+            });
             
-            // 添加浮动动画
+            const layer = new Konva.Layer();
+            
+            // 绘制江西地图轮廓
+            const jiangxiMap = new Konva.Path({
+                x: 50,
+                y: 50,
+                data: 'M150,100 C200,80 250,90 300,110 C350,130 380,150 400,180 C420,210 430,250 410,280 C390,310 350,330 310,330 C270,330 230,310 200,290 C170,270 140,240 130,210 C120,180 130,150 150,130 Z',
+                fill: '#e6f7ff',
+                stroke: '#1890ff',
+                strokeWidth: 2,
+                shadowColor: 'rgba(0,0,0,0.1)',
+                shadowBlur: 5,
+                shadowOffset: {x: 2, y: 2}
+            });
+            
+            // 添加河流
+            const river = new Konva.Path({
+                x: 0,
+                y: 0,
+                data: 'M100,150 C150,160 200,170 250,180 C300,190 350,200 400,210 C450,220 500,230 550,240',
+                stroke: '#40a9ff',
+                strokeWidth: 8,
+                lineCap: 'round',
+                lineJoin: 'round',
+                dash: [10, 5],
+            });
+            
+            // 标记万寿宫位置
+            const templeMarker = new Konva.Circle({
+                x: 400,
+                y: 200,
+                radius: 18,
+                fill: 'red',
+                stroke: '#8b0000',
+                strokeWidth: 2,
+                shadowColor: 'rgba(0,0,0,0.3)',
+                shadowBlur: 10,
+                shadowOffset: {x: 0, y: 3},
+                name: 'temple',
+                draggable: false
+            });
+            
+            // 万寿宫标记文字
+            const templeLabel = new Konva.Text({
+                x: 425,
+                y: 185,
+                text: '西山万寿宫',
+                fontSize: 16,
+                fontFamily: 'Microsoft YaHei',
+                fill: '#8b0000',
+                padding: 5,
+                align: 'center'
+            });
+            
+            // 添加建筑标记
+            const buildings = [
+                {id: 'main_hall', x: 380, y: 180, color: 'gold', name: '正殿'},
+                {id: 'opera_stage', x: 300, y: 220, color: 'green', name: '戏台'},
+                {id: 'incense_burner', x: 350, y: 250, color: 'orange', name: '香炉'},
+                {id: 'bell_tower', x: 430, y: 160, color: 'purple', name: '钟楼'},
+                {id: 'drum_tower', x: 330, y: 160, color: 'teal', name: '鼓楼'}
+            ];
+            
             buildings.forEach(b => {
                 const building = new Konva.Circle({
-                    // ...原有设置...
+                    x: b.x,
+                    y: b.y,
+                    radius: 10,
+                    fill: b.color,
+                    stroke: '#333',
+                    strokeWidth: 1,
+                    shadowColor: 'rgba(0,0,0,0.2)',
+                    shadowBlur: 5,
+                    shadowOffset: {x: 0, y: 2},
+                    name: b.id,
+                    draggable: false
                 });
                 
-                // 添加浮动动画
+                // 建筑名称标签
+                const label = new Konva.Text({
+                    x: b.x - 25,
+                    y: b.y + 15,
+                    text: b.name,
+                    fontSize: 14,
+                    fontFamily: 'Microsoft YaHei',
+                    fill: '#333',
+                    padding: 2,
+                    align: 'center',
+                    visible: false
+                });
+                
+                // 悬停效果
                 building.on('mouseover', function() {
-                    this.setAttr('shadowBlur', 10);
-                    this.setAttr('shadowColor', 'rgba(0,0,0,0.5)');
+                    this.strokeWidth(2);
+                    this.scale({x: 1.2, y: 1.2});
+                    label.visible(true);
                     layer.draw();
+                    
+                    // 在信息面板显示建筑信息
+                    document.querySelector('.building-title').textContent = b.name;
+                    document.querySelector('.building-desc').textContent = getBuildingDescription(b.id);
+                    document.querySelector('.building-image').innerHTML = `
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#bbdefb;color:#0d47a1;">
+                            <i class="fas fa-${getBuildingIcon(b.id)}" style="font-size:3rem;"></i>
+                            <p style="margin-top:15px;font-weight:bold;">${b.name}示意图</p>
+                        </div>
+                    `;
                 });
                 
                 building.on('mouseout', function() {
-                    this.setAttr('shadowBlur', 0);
+                    this.strokeWidth(1);
+                    this.scale({x: 1, y: 1});
+                    label.visible(false);
                     layer.draw();
                 });
                 
-                // ...其余代码...
+                // 点击事件
+                building.on('click', function() {
+                    // 高亮显示选中的建筑
+                    buildings.forEach(b => {
+                        const bld = layer.findOne('.' + b.id);
+                        if (bld) {
+                            bld.strokeWidth(1);
+                            bld.stroke('#333');
+                        }
+                    });
+                    
+                    this.strokeWidth(3);
+                    this.stroke('#1890ff');
+                    layer.draw();
+                    
+                    // 在信息面板显示详细信息
+                    document.querySelector('.building-title').textContent = b.name;
+                    document.querySelector('.building-desc').textContent = getBuildingDescription(b.id);
+                    document.querySelector('.building-image').innerHTML = `
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#bbdefb;color:#0d47a1;padding:15px;text-align:center;">
+                            <i class="fas fa-${getBuildingIcon(b.id)}" style="font-size:3rem;"></i>
+                            <h4 style="margin:10px 0;">${b.name}</h4>
+                            <p>${getBuildingDetail(b.id)}</p>
+                        </div>
+                    `;
+                });
+                
+                layer.add(building);
+                layer.add(label);
             });
+            
+            // 添加列表项点击事件
+            document.querySelectorAll('.building-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const building = layer.findOne('.' + id);
+                    
+                    if (building) {
+                        building.fire('click');
+                        
+                        // 滚动到视图
+                        stage.position({
+                            x: -building.x() + stage.width() / 3,
+                            y: -building.y() + stage.height() / 3
+                        });
+                        layer.draw();
+                    }
+                });
+            });
+            
+            // 添加组件到舞台
+            layer.add(jiangxiMap);
+            layer.add(river);
+            layer.add(templeMarker);
+            layer.add(templeLabel);
+            stage.add(layer);
+            
+            // 缩放功能
+            stage.on('wheel', (e) => {
+                e.evt.preventDefault();
+                const scaleBy = 1.1;
+                const oldScale = stage.scaleX();
+                const pointer = stage.getPointerPosition();
+                
+                const mousePointTo = {
+                    x: (pointer.x - stage.x()) / oldScale,
+                    y: (pointer.y - stage.y()) / oldScale
+                };
+                
+                const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+                
+                stage.scale({ x: newScale, y: newScale });
+                
+                const newPos = {
+                    x: pointer.x - mousePointTo.x * newScale,
+                    y: pointer.y - mousePointTo.y * newScale
+                };
+                
+                stage.position(newPos);
+                stage.batchDraw();
+            });
+            
+            // 拖拽功能
+            stage.on('mousedown touchstart', () => {
+                document.body.style.cursor = 'grabbing';
+            });
+            
+            stage.on('mouseup touchend', () => {
+                document.body.style.cursor = 'default';
+            });
+        }
+        
+        // 获取建筑描述
+        function getBuildingDescription(id) {
+            const descriptions = {
+                'main_hall': '正殿是西山万寿宫的核心建筑，供奉许真君神像。建筑采用重檐歇山顶，面阔五间，进深三间，是典型的明代宫观建筑风格。',
+                'opera_stage': '戏台位于万寿宫前院，是庙会期间表演酬神戏剧的场所。戏台为木质结构，雕梁画栋，具有极高的艺术价值。',
+                'incense_burner': '宫前巨型香炉，由青铜铸造，高约2.5米。香火鼎盛时期，每日有数百信众在此焚香祈福。',
+                'bell_tower': '钟楼位于万寿宫东侧，内悬明代古钟一口，重达千斤。每日晨钟暮鼓，为宫观增添庄严肃穆之气。',
+                'drum_tower': '鼓楼与钟楼对称而立，内置大鼓一面。每逢重要法会，钟鼓齐鸣，声震四方。'
+            };
+            return descriptions[id] || '暂无描述信息';
+        }
+        
+        // 获取建筑详情
+        function getBuildingDetail(id) {
+            const details = {
+                'main_hall': '始建于明万历年间，现存建筑为清代重建。殿内供奉许真君鎏金铜像，高3.6米，为江南地区最大的道教神像之一。',
+                'opera_stage': '建于清乾隆年间，台高1.5米，宽8米，深6米。台顶为八角藻井结构，绘有道教八卦图案，音响效果极佳。',
+                'incense_burner': '清道光二十五年(1845年)铸造，炉身刻有"万寿无疆"四字及八仙过海浮雕图案，为省级重点保护文物。',
+                'bell_tower': '楼高15米，三层四角攒尖顶。所悬铜钟铸于明嘉靖三十八年(1559年)，钟声可传十里之遥。',
+                'drum_tower': '建筑形制与钟楼相同，鼓面直径1.8米，使用整张牛皮制成。鼓楼二层设有观景台，可俯瞰全宫景色。'
+            };
+            return details[id] || '暂无详细信息';
+        }
+        
+        // 获取建筑图标
+        function getBuildingIcon(id) {
+            const icons = {
+                'main_hall': 'place-of-worship',
+                'opera_stage': 'theater-masks',
+                'incense_burner': 'fire',
+                'bell_tower': 'bell',
+                'drum_tower': 'drum'
+            };
+            return icons[id] || 'landmark';
         }
     </script>
 </body>
