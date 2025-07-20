@@ -243,3 +243,111 @@ body {
         margin: 0 0 0 1rem;
     }
 }
+
+
+/* === 全局导航按钮 === */
+.nav-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.nav-button:hover {
+    transform: scale(1.1);
+}
+
+/* === 增强地图样式 === */
+.map-container {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    height: 70vh;
+    margin: 2rem auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.map-header {
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #0d47a1;
+    position: relative;
+}
+
+.map-header::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(to right, #0d47a1, #1a6dcc);
+    margin: 10px auto;
+    border-radius: 2px;
+}
+
+/* === 祭祀页面优化 === */
+.ritual-scene {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.ritual-controls button, .offering-table button {
+    background: linear-gradient(to right, #0d47a1, #1a6dcc);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.ritual-controls button:hover, .offering-table button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(13, 71, 161, 0.4);
+}
+
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+/* === 动画增强 === */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.floating {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* === 移动端优化 === */
+@media (max-width: 768px) {
+    .map-container, .ritual-scene {
+        width: 95%;
+        height: 50vh;
+    }
+    
+    .info-panel {
+        position: relative;
+        width: 100%;
+        margin-top: 20px;
+        right: 0;
+        top: 0;
+    }
+}

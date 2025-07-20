@@ -48,3 +48,45 @@ document.addEventListener('DOMContentLoaded', function() {
         item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     });
 });
+
+// === 增强导航功能 ===
+function navigateTo(path) {
+    // 添加转场动画
+    document.body.style.opacity = 0;
+    document.body.style.transition = 'opacity 0.3s ease';
+    
+    setTimeout(() => {
+        window.location.href = path;
+    }, 300);
+}
+
+// === 添加页面加载动画 ===
+window.addEventListener('load', function() {
+    document.body.style.opacity = 0;
+    setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = 1;
+    }, 100);
+});
+
+// === 增强卡片点击效果 ===
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function() {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 200);
+    });
+});
+
+// === 添加历史时间线点击效果 ===
+document.querySelectorAll('.timeline-item').forEach(item => {
+    item.addEventListener('click', function() {
+        this.style.transform = 'scale(1.03)';
+        this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+        setTimeout(() => {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        }, 300);
+    });
+});

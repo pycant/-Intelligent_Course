@@ -3,6 +3,7 @@
 <html>
 <head>
     <title>祭祀活动模拟</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .ritual-scene { 
             width: 800px; 
@@ -41,7 +42,19 @@
     </style>
 </head>
 <body>
-    <h1>许真君祭祀活动模拟</h1>
+        <!-- 添加返回按钮 -->
+    <div class="nav-button" onclick="navigateTo('/')">
+        ←
+    </div>
+    
+    <!-- 更新标题样式 -->
+    <h1 class="map-header">许真君祭祀活动模拟</h1>
+    
+    <!-- 添加仪式说明 -->
+    <div style="text-align:center;max-width:800px;margin:0 auto 20px;padding:0 20px;">
+        <p>体验传统祭祀仪式，了解许真君信仰的文化内涵。选择祭品参与祭祀，完成仪式步骤。</p>
+    </div>
+
     <div class="ritual-scene">
         <div class="offering-table">
             <h3>祭品台</h3>
@@ -98,13 +111,44 @@
         
         function performRitual(type) {
             closeModal();
+            const scene = document.querySelector('.ritual-scene');
+            
             if(type === 'music') {
-                alert('正在播放祭祀音乐...');
-                // 实际实现时替换为音频播放
+                // 添加音乐播放反馈
+                scene.style.background = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/800x500?text=祭祀音乐播放中')";
+                scene.innerHTML += `
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
+                        background:rgba(255,255,255,0.9); padding:20px; border-radius:10px; text-align:center;">
+                        <h3>祭祀音乐播放中</h3>
+                        <p>传统道教祭祀乐曲《步虚韵》</p>
+                        <div style="font-size:3rem;">🎵</div>
+                    </div>
+                `;
+                
+                // 3秒后恢复
+                setTimeout(() => {
+                    scene.style.background = "url('https://via.placeholder.com/800x500?text=祭祀场景背景')";
+                    scene.innerHTML = document.querySelector('.ritual-scene').innerHTML;
+                }, 3000);
+                
             } else if(type === 'kowtow') {
-                document.querySelector('.ritual-scene').style.transform = 'perspective(500px) rotateX(20deg)';
-                alert('执行跪拜礼，念诵祝词');
+                // 添加跪拜效果
+                scene.style.transform = 'perspective(500px) rotateX(20deg)';
+                
+                // 显示祝词
+                scene.innerHTML += `
+                    <div style="position:absolute; bottom:0; left:0; right:0; 
+                        background:rgba(0,0,0,0.7); color:white; padding:20px; text-align:center;
+                        font-size:1.2rem; line-height:1.6;">
+                        <p>一跪三叩，念诵：</p>
+                        <p style="font-weight:bold; margin-top:10px;">"仰祈真君，福佑江右，<br>水旱不侵，五谷丰登"</p>
+                    </div>
+                `;
             }
+        }
+        // 添加导航功能
+        function navigateTo(path) {
+            window.location.href = path;
         }
         
         function closeModal() {
