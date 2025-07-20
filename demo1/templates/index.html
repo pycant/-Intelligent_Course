@@ -1,0 +1,75 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>许真君信仰数字课程</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>江西水文化数字课程</h1>
+        <h2>许真君信仰探源</h2>
+    </header>
+    
+    <main class="container">
+        <section class="intro-section">
+            <div class="intro-content">
+                <p>许逊（许真君）是江西最重要的水神崇拜对象，道教人物。传说他斩蛟治水、造福一方，被尊为江西的地方保护神，尤其与水患治理密切相关。</p>
+                <p>西山万寿宫（南昌）是其祖庭，祭祀活动盛大。本课程将带您探索这一独特的文化信仰。</p>
+            </div>
+            <div class="intro-image">
+                <div class="placeholder-image"></div>
+            </div>
+        </section>
+        
+        <section class="module-cards">
+            <div class="card" onclick="navigateTo('/map')">
+                <div class="card-icon">🗺️</div>
+                <h3>西山万寿宫探索</h3>
+                <p>交互式地图，了解建筑布局与历史变迁</p>
+            </div>
+            
+            <div class="card" onclick="navigateTo('/ritual')">
+                <div class="card-icon">🕯️</div>
+                <h3>祭祀活动模拟</h3>
+                <p>体验传统祭祀仪式，了解文化内涵</p>
+            </div>
+            
+            <div class="card coming-soon">
+                <div class="card-icon">📜</div>
+                <h3>斩蛟传说</h3>
+                <p>即将开放</p>
+            </div>
+        </section>
+        
+        <section class="timeline-section">
+            <h3>许真君信仰历史脉络</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">239年</div>
+                    <div class="timeline-content">许逊出生于南昌</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">4世纪</div>
+                    <div class="timeline-content">治理赣江水患，斩蛟除害</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">1116年</div>
+                    <div class="timeline-content">宋徽宗封为"神功妙济真君"</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">现今</div>
+                    <div class="timeline-content">每年西山万寿宫庙会吸引数十万信众</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <p>江西水文化数字课程 © 2023 | 技术支持: Flask Web框架</p>
+    </footer>
+</body>
+</html>

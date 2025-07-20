@@ -1,0 +1,116 @@
+<!-- templates/ritual.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>祭祀活动模拟</title>
+    <style>
+        .ritual-scene { 
+            width: 800px; 
+            height: 500px; 
+            background: url('https://via.placeholder.com/800x500?text=祭祀场景背景') no-repeat;
+            position: relative;
+        }
+        .offering-table {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
+        }
+        .ritual-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>许真君祭祀活动模拟</h1>
+    <div class="ritual-scene">
+        <div class="offering-table">
+            <h3>祭品台</h3>
+            <div id="offerings">
+                {% for item in data.offerings %}
+                <button onclick="selectOffering('{{ item.id }}')">{{ item.name }}</button>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="ritual-controls">
+            <button onclick="showProcedures()">仪式步骤</button>
+        </div>
+    </div>
+
+    <!-- 祭品意义弹窗 -->
+    <div id="offering-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="offering-name"></h2>
+            <p id="offering-meaning"></p>
+            <button onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+
+    <!-- 仪式选择弹窗 -->
+    <div id="procedure-modal" class="modal">
+        <div class="modal-content">
+            <h2>选择仪式步骤</h2>
+            <div id="procedures">
+                {% for item in data.procedures %}
+                <button onclick="performRitual('{{ item.id }}')">{{ item.name }}</button>
+                {% endfor %}
+            </div>
+            <button onclick="closeModal()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 祭品选择功能
+        function selectOffering(id) {
+            fetch(`/get_offering/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('offering-name').textContent = data.name;
+                    document.getElementById('offering-meaning').textContent = data.meaning;
+                    document.getElementById('offering-modal').style.display = 'block';
+                });
+        }
+        
+        // 仪式流程控制
+        function showProcedures() {
+            document.getElementById('procedure-modal').style.display = 'block';
+        }
+        
+        function performRitual(type) {
+            closeModal();
+            if(type === 'music') {
+                alert('正在播放祭祀音乐...');
+                // 实际实现时替换为音频播放
+            } else if(type === 'kowtow') {
+                document.querySelector('.ritual-scene').style.transform = 'perspective(500px) rotateX(20deg)';
+                alert('执行跪拜礼，念诵祝词');
+            }
+        }
+        
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.querySelector('.ritual-scene').style.transform = '';
+        }
+    </script>
+</body>
+</html>

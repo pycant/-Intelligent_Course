@@ -1,0 +1,245 @@
+/* static/css/style.css */
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Microsoft YaHei', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.header {
+    background: linear-gradient(135deg, #1a6dcc 0%, #0d4a9e 100%);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.header h2 {
+    font-size: 1.8rem;
+    font-weight: 300;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* 介绍部分 */
+.intro-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+}
+
+.intro-content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.intro-content p {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.intro-image {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-image {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(45deg, #e0f7fa, #bbdefb);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0d47a1;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* 卡片模块 */
+.module-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card-icon {
+    background: #0d47a1;
+    color: white;
+    font-size: 3rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.card h3 {
+    padding: 1.5rem 1.5rem 0.5rem;
+    color: #0d47a1;
+}
+
+.card p {
+    padding: 0 1.5rem 1.5rem;
+    color: #555;
+}
+
+.coming-soon {
+    position: relative;
+}
+
+.coming-soon::after {
+    content: "开发中";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff9800;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0 0 0 10px;
+    font-size: 0.9rem;
+}
+
+/* 时间线部分 */
+.timeline-section {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    margin-bottom: 3rem;
+}
+
+.timeline-section h3 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #0d47a1;
+    font-size: 1.8rem;
+}
+
+.timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #0d47a1;
+    left: 50%;
+    margin-left: -2px;
+}
+
+.timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+.timeline-item:nth-child(odd) {
+    left: 0;
+    text-align: right;
+}
+
+.timeline-item:nth-child(even) {
+    left: 50%;
+}
+
+.timeline-date {
+    background: #0d47a1;
+    color: white;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content {
+    background: #e3f2fd;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-right: 1rem;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-left: 1rem;
+}
+
+/* 页脚 */
+.footer {
+    background: #0d47a1;
+    color: white;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-item {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+        text-align: left !important;
+    }
+    
+    .timeline-item:nth-child(even) {
+        left: 0;
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-content,
+    .timeline-item:nth-child(even) .timeline-content {
+        margin: 0 0 0 1rem;
+    }
+}

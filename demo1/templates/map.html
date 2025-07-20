@@ -1,0 +1,106 @@
+<!-- templates/map.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>西山万寿宫交互地图</title>
+    <script src="https://cdn.jsdelivr.net/npm/konva@8.3.14/konva.min.js"></script>
+    <style>
+        #map-container { width: 800px; height: 500px; border: 1px solid #ccc; }
+        .info-panel { position: absolute; right: 20px; top: 20px; background: rgba(255,255,255,0.9); padding: 15px; }
+        .timeline { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>西山万寿宫交互地图</h1>
+    <div id="map-container"></div>
+    
+    <div class="info-panel">
+        <h3 id="building-name">-- 选择建筑 --</h3>
+        <p id="building-desc">点击地图中的建筑查看详情</p>
+        
+        <div class="timeline">
+            <button onclick="showView('modern')">现代风貌</button>
+            <button onclick="showView('qing_dynasty')">清代复原</button>
+            <p id="view-desc">{{ data.history.modern }}</p>
+        </div>
+    </div>
+
+    <script>
+        // 创建简易地图
+        const stage = new Konva.Stage({
+            container: 'map-container',
+            width: 800,
+            height: 500
+        });
+        const layer = new Konva.Layer();
+        
+        // 绘制基础地图（模拟江西地图）
+        const jiangxiMap = new Konva.Rect({
+            x: 50,
+            y: 50,
+            width: 700,
+            height: 400,
+            fill: '#e6f7ff',
+            stroke: '#1890ff',
+            strokeWidth: 2
+        });
+        
+        // 标记万寿宫位置
+        const templeMarker = new Konva.Circle({
+            x: 400,
+            y: 200,
+            radius: 15,
+            fill: 'red',
+            stroke: 'black',
+            strokeWidth: 1,
+            name: 'temple'
+        });
+        
+        // 添加建筑标记
+        const buildings = [
+            {id: 'main_hall', x: 380, y: 180, color: 'gold'},
+            {id: 'opera_stage', x: 300, y: 220, color: 'green'},
+            {id: 'incense_burner', x: 350, y: 250, color: 'orange'}
+        ];
+        
+        buildings.forEach(b => {
+            const building = new Konva.Circle({
+                x: b.x,
+                y: b.y,
+                radius: 8,
+                fill: b.color,
+                name: b.id
+            });
+            
+            building.on('click', () => {
+                fetch(`/get_building/${b.id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('building-name').textContent = data.name;
+                        document.getElementById('building-desc').textContent = data.desc;
+                    });
+            });
+            
+            layer.add(building);
+        });
+        
+        // 添加交互事件
+        templeMarker.on('click', () => {
+            alert('已进入万寿宫区域，可点击具体建筑查看详情');
+        });
+        
+        layer.add(jiangxiMap);
+        layer.add(templeMarker);
+        stage.add(layer);
+        
+        // 视图切换功能
+        function showView(era) {
+            const views = {
+                modern: "{{ data.history.modern }}",
+                qing_dynasty: "{{ data.history.qing_dynasty }}"
+            };
+            document.getElementById('view-desc').textContent = views[era];
+        }
+    </script>
+</body>
+</html>
