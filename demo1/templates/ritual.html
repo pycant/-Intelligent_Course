@@ -1,225 +1,29 @@
+<!-- templates/ritual.html -->
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>祭祀活动模拟</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            color: #333;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        
-        /* 顶部导航 */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
+        .ritual-scene { 
+            width: 800px; 
+            height: 500px; 
+            background: url('https://via.placeholder.com/800x500?text=祭祀场景背景') no-repeat;
             position: relative;
-            z-index: 100;
         }
-        
-        .nav-button {
-            background: #1890ff;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 3px 10px rgba(24, 144, 255, 0.4);
-        }
-        
-        .nav-button:hover {
-            background: #40a9ff;
-            transform: scale(1.05);
-        }
-        
-        .title-container {
-            text-align: center;
-        }
-        
-        .ritual-header {
-            font-size: 2.2rem;
-            color: #1a2980;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-        
-        .ritual-subtitle {
-            font-size: 1.1rem;
-            color: #666;
-            font-weight: normal;
-        }
-        
-        /* 主内容区 */
-        .ritual-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        /* 祭祀场景 */
-        .ritual-scene {
-            width: 100%;
-            max-width: 900px;
-            height: 500px;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                         url('https://images.unsplash.com/photo-1621570366590-fd7e5ddf7f5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        
-        .scene-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 30px;
-            z-index: 2;
-        }
-        
-        .temple-icon {
-            font-size: 5rem;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-            margin-top: 20px;
-            animation: glow 3s ease-in-out infinite;
-        }
-        
-        @keyframes glow {
-            0% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-            50% { text-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
-            100% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-        }
-        
-        .ritual-title {
-            color: white;
-            font-size: 2.5rem;
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            margin-top: 20px;
-        }
-        
-        /* 祭品台 */
         .offering-table {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 700px;
-            margin-bottom: 30px;
-            text-align: center;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
         }
-        
-        .offering-title {
-            font-size: 1.8rem;
-            color: #1a2980;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #26d0ce;
-        }
-        
-        .offerings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .offering-item {
-            background: white;
-            border-radius: 10px;
-            padding: 15px 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border: 2px solid transparent;
-        }
-        
-        .offering-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            border-color: #1890ff;
-        }
-        
-        .offering-icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #1a2980;
-        }
-        
-        .offering-name {
-            font-weight: bold;
-            color: #333;
-        }
-        
-        /* 仪式控制区 */
         .ritual-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-            width: 100%;
+            position: absolute;
+            top: 20px;
+            right: 20px;
         }
-        
-        .ritual-btn {
-            background: linear-gradient(to right, #1a2980, #26d0ce);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .ritual-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(26, 41, 128, 0.6);
-        }
-        
-        .ritual-btn i {
-            font-size: 1.4rem;
-        }
-        
-        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -227,714 +31,129 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            background: rgba(0,0,0,0.5);
         }
-        
         .modal-content {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 600px;
-            overflow: hidden;
-            transform: scale(0.9);
-            animation: modalAppear 0.4s forwards;
-        }
-        
-        @keyframes modalAppear {
-            to { transform: scale(1); }
-        }
-        
-        .modal-header {
-            background: linear-gradient(to right, #1a2980, #26d0ce);
-            color: white;
+            margin: 15% auto;
             padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .modal-title {
-            font-size: 1.8rem;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .close-modal:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .modal-body {
-            padding: 30px;
-        }
-        
-        .offering-detail {
-            text-align: center;
-            padding: 20px 0;
-        }
-        
-        .offering-detail-icon {
-            font-size: 4rem;
-            color: #1a2980;
-            margin-bottom: 20px;
-        }
-        
-        .offering-detail-name {
-            font-size: 1.8rem;
-            color: #1a2980;
-            margin-bottom: 15px;
-        }
-        
-        .offering-detail-meaning {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: #555;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        .procedures-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .procedure-item {
-            background: white;
-            border-radius: 10px;
-            padding: 25px 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border: 2px solid #e0e0e0;
-        }
-        
-        .procedure-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            border-color: #1890ff;
-            background: #f0f8ff;
-        }
-        
-        .procedure-icon {
-            font-size: 2.5rem;
-            color: #1a2980;
-            margin-bottom: 15px;
-        }
-        
-        .procedure-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        /* 效果展示 */
-        .effect-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-        
-        .effect-content {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            max-width: 80%;
-            transform: scale(0.8);
-            animation: effectAppear 0.6s forwards;
-        }
-        
-        @keyframes effectAppear {
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .effect-icon {
-            font-size: 4rem;
-            color: #d4af37;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .effect-title {
-            font-size: 2rem;
-            color: #1a2980;
-            margin-bottom: 15px;
-        }
-        
-        .effect-text {
-            font-size: 1.2rem;
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        /* 进度指示器 */
-        .progress-container {
-            width: 100%;
-            max-width: 700px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            margin-top: 20px;
-        }
-        
-        .progress-title {
-            text-align: center;
-            font-size: 1.5rem;
-            color: #1a2980;
-            margin-bottom: 15px;
-        }
-        
-        .progress-steps {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-bottom: 30px;
-        }
-        
-        .progress-steps::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            z-index: 1;
-        }
-        
-        .progress-bar {
-            position: absolute;
-            top: 20px;
-            left: 0;
-            height: 6px;
-            background: #26d0ce;
-            z-index: 2;
-            transition: width 0.5s;
-        }
-        
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 3;
-        }
-        
-        .step-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            color: #888;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-        
-        .step.active .step-icon {
-            background: #1a2980;
-            color: white;
-            box-shadow: 0 0 0 8px rgba(26, 41, 128, 0.2);
-        }
-        
-        .step.completed .step-icon {
-            background: #26d0ce;
-            color: white;
-        }
-        
-        .step-name {
-            font-size: 0.9rem;
-            color: #666;
-            text-align: center;
-            max-width: 100px;
-        }
-        
-        .step.active .step-name {
-            color: #1a2980;
-            font-weight: bold;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .ritual-header {
-                font-size: 1.8rem;
-            }
-            
-            .ritual-scene {
-                height: 400px;
-            }
-            
-            .temple-icon {
-                font-size: 4rem;
-            }
-            
-            .ritual-title {
-                font-size: 2rem;
-            }
-            
-            .offering-title {
-                font-size: 1.5rem;
-            }
-            
-            .ritual-btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
-            
-            .procedures-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .top-nav {
-                padding: 12px 15px;
-            }
-            
-            .ritual-scene {
-                height: 350px;
-            }
-            
-            .offering-table {
-                padding: 15px;
-            }
-            
-            .offerings-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .ritual-controls {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .ritual-btn {
-                width: 100%;
-                justify-content: center;
-            }
+            width: 50%;
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
-    <div class="top-nav">
-        <div class="nav-button" onclick="navigateTo('/')">
-            <i class="fas fa-arrow-left"></i>
-        </div>
-        <div class="title-container">
-            <h1 class="ritual-header">许真君祭祀活动模拟</h1>
-            <p class="ritual-subtitle">体验传统祭祀仪式，感受道教文化魅力</p>
-        </div>
-        <div class="nav-button" style="visibility: hidden;">
-            <i class="fas fa-arrow-left"></i>
-        </div>
+        <!-- 添加返回按钮 -->
+    <div class="nav-button" onclick="navigateTo('/')">
+        ←
     </div>
     
-    <!-- 主内容区 -->
-    <div class="ritual-container">
-        <!-- 祭祀场景 -->
-        <div class="ritual-scene">
-            <div class="scene-content">
-                <div class="temple-icon">
-                    <i class="fas fa-torii-gate"></i>
-                </div>
-                <h2 class="ritual-title">西山万寿宫祭祀大典</h2>
-            </div>
-            
-            <!-- 祭祀效果展示 -->
-            <div class="effect-overlay" id="music-effect">
-                <div class="effect-content">
-                    <div class="effect-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3 class="effect-title">祭祀音乐演奏中</h3>
-                    <p class="effect-text">传统道教祭祀乐曲《步虚韵》</p>
-                    <p>庄严肃穆，净化心灵，传达对许真君的崇敬之情</p>
-                </div>
-            </div>
-            
-            <div class="effect-overlay" id="kowtow-effect">
-                <div class="effect-content">
-                    <div class="effect-icon">
-                        <i class="fas fa-hands-praying"></i>
-                    </div>
-                    <h3 class="effect-title">行跪拜礼</h3>
-                    <p class="effect-text">一跪三叩，虔诚祈福</p>
-                    <p style="font-size: 1.3rem; font-weight: bold; margin-top: 15px; color: #1a2980;">
-                        "仰祈真君，福佑江右，水旱不侵，五谷丰登"
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 祭品台 -->
+    <!-- 更新标题样式 -->
+    <h1 class="map-header">许真君祭祀活动模拟</h1>
+    
+    <!-- 添加仪式说明 -->
+    <div style="text-align:center;max-width:800px;margin:0 auto 20px;padding:0 20px;">
+        <p>体验传统祭祀仪式，了解许真君信仰的文化内涵。选择祭品参与祭祀，完成仪式步骤。</p>
+    </div>
+
+    <div class="ritual-scene">
         <div class="offering-table">
-            <h2 class="offering-title">祭品台</h2>
-            <p>选择祭品敬献许真君，表达虔诚与敬意</p>
-            
-            <div class="offerings-grid">
-                <div class="offering-item" data-id="wine">
-                    <div class="offering-icon">
-                        <i class="fas fa-wine-bottle"></i>
-                    </div>
-                    <div class="offering-name">酒</div>
-                </div>
-                
-                <div class="offering-item" data-id="grain">
-                    <div class="offering-icon">
-                        <i class="fas fa-wheat-alt"></i>
-                    </div>
-                    <div class="offering-name">谷物</div>
-                </div>
-                
-                <div class="offering-item" data-id="silk">
-                    <div class="offering-icon">
-                        <i class="fas fa-tshirt"></i>
-                    </div>
-                    <div class="offering-name">丝绸</div>
-                </div>
-                
-                <div class="offering-item" data-id="fruit">
-                    <div class="offering-icon">
-                        <i class="fas fa-apple-alt"></i>
-                    </div>
-                    <div class="offering-name">水果</div>
-                </div>
-                
-                <div class="offering-item" data-id="incense">
-                    <div class="offering-icon">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="offering-name">香烛</div>
-                </div>
+            <h3>祭品台</h3>
+            <div id="offerings">
+                {% for item in data.offerings %}
+                <button onclick="selectOffering('{{ item.id }}')">{{ item.name }}</button>
+                {% endfor %}
             </div>
         </div>
         
-        <!-- 仪式控制区 -->
         <div class="ritual-controls">
-            <button class="ritual-btn" onclick="showProcedures()">
-                <i class="fas fa-list-ol"></i> 仪式步骤
-            </button>
-            <button class="ritual-btn" onclick="resetRitual()">
-                <i class="fas fa-redo"></i> 重置仪式
-            </button>
-        </div>
-        
-        <!-- 进度指示器 -->
-        <div class="progress-container">
-            <h3 class="progress-title">祭祀进度</h3>
-            <div class="progress-steps">
-                <div class="progress-bar" id="progress-bar"></div>
-                
-                <div class="step completed" id="step-offering">
-                    <div class="step-icon">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <div class="step-name">准备祭品</div>
-                </div>
-                
-                <div class="step" id="step-music">
-                    <div class="step-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <div class="step-name">演奏祭乐</div>
-                </div>
-                
-                <div class="step" id="step-kowtow">
-                    <div class="step-icon">
-                        <i class="fas fa-hands-praying"></i>
-                    </div>
-                    <div class="step-name">行跪拜礼</div>
-                </div>
-                
-                <div class="step" id="step-pray">
-                    <div class="step-icon">
-                        <i class="fas fa-pray"></i>
-                    </div>
-                    <div class="step-name">诵读祝文</div>
-                </div>
-                
-                <div class="step" id="step-complete">
-                    <div class="step-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="step-name">完成祭祀</div>
-                </div>
-            </div>
+            <button onclick="showProcedures()">仪式步骤</button>
         </div>
     </div>
-    
+
     <!-- 祭品意义弹窗 -->
     <div id="offering-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">祭品含义</h2>
-                <button class="close-modal" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="offering-detail">
-                    <div class="offering-detail-icon" id="offering-detail-icon">
-                        <i class="fas fa-wine-bottle"></i>
-                    </div>
-                    <h3 class="offering-detail-name" id="offering-detail-name">酒</h3>
-                    <p class="offering-detail-meaning" id="offering-detail-meaning">
-                        象征敬意与虔诚，表达对神灵的尊崇
-                    </p>
-                </div>
-            </div>
+            <h2 id="offering-name"></h2>
+            <p id="offering-meaning"></p>
+            <button onclick="closeModal()">关闭</button>
         </div>
     </div>
-    
+
     <!-- 仪式选择弹窗 -->
     <div id="procedure-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">选择仪式步骤</h2>
-                <button class="close-modal" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+            <h2>选择仪式步骤</h2>
+            <div id="procedures">
+                {% for item in data.procedures %}
+                <button onclick="performRitual('{{ item.id }}')">{{ item.name }}</button>
+                {% endfor %}
             </div>
-            <div class="modal-body">
-                <p style="text-align: center; margin-bottom: 20px; font-size: 1.1rem;">
-                    请选择要进行的仪式步骤，完成祭祀流程
-                </p>
-                
-                <div class="procedures-grid">
-                    <div class="procedure-item" data-type="music">
-                        <div class="procedure-icon">
-                            <i class="fas fa-music"></i>
-                        </div>
-                        <div class="procedure-name">献乐</div>
-                    </div>
-                    
-                    <div class="procedure-item" data-type="kowtow">
-                        <div class="procedure-icon">
-                            <i class="fas fa-hands-praying"></i>
-                        </div>
-                        <div class="procedure-name">跪拜</div>
-                    </div>
-                    
-                    <div class="procedure-item" data-type="pray">
-                        <div class="procedure-icon">
-                            <i class="fas fa-pray"></i>
-                        </div>
-                        <div class="procedure-name">诵读祝文</div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <button class="ritual-btn" onclick="closeModal()" style="background: #666;">
-                        <i class="fas fa-times"></i> 取消
-                    </button>
-                </div>
-            </div>
+            <button onclick="closeModal()">取消</button>
         </div>
     </div>
 
     <script>
-        // 导航功能
-        function navigateTo(path) {
-            window.location.href = path;
-        }
-        
-        // 初始化祭祀进度
-        let ritualProgress = 1;
-        const totalSteps = 5;
-        updateProgress();
-        
-        // 更新进度条
-        function updateProgress() {
-            const progressBar = document.getElementById('progress-bar');
-            const progressPercent = ((ritualProgress - 1) / (totalSteps - 1)) * 100;
-            progressBar.style.width = `${progressPercent}%`;
-            
-            // 更新步骤状态
-            for (let i = 1; i <= totalSteps; i++) {
-                const step = document.getElementById(`step-${getStepId(i)}`);
-                step.classList.remove('active', 'completed');
-                
-                if (i < ritualProgress) {
-                    step.classList.add('completed');
-                } else if (i === ritualProgress) {
-                    step.classList.add('active');
-                }
-            }
-        }
-        
-        // 获取步骤ID
-        function getStepId(stepNum) {
-            const steps = ['offering', 'music', 'kowtow', 'pray', 'complete'];
-            return steps[stepNum - 1] || '';
-        }
-        
         // 祭品选择功能
-        document.querySelectorAll('.offering-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const id = this.dataset.id;
-                showOfferingDetail(id);
-            });
-        });
-        
-        function showOfferingDetail(id) {
-            const offerings = {
-                wine: {
-                    name: "酒",
-                    icon: "fa-wine-bottle",
-                    meaning: "象征敬意与虔诚，表达对神灵的尊崇。在道教祭祀中，酒代表纯净与神圣，用于敬献神明，传达信众的虔诚之心。"
-                },
-                grain: {
-                    name: "谷物",
-                    icon: "fa-wheat-alt",
-                    meaning: "代表丰收与富足，祈求五谷丰登。谷物象征大地恩赐，与许真君治水保障农耕的功绩相呼应，表达对农业丰收的祈愿。"
-                },
-                silk: {
-                    name: "丝绸",
-                    icon: "fa-tshirt",
-                    meaning: "象征富贵吉祥，表达对神明的敬意。丝绸在古代是珍贵物品，敬献丝绸表示对神明的最高敬意，祈求富贵平安。"
-                },
-                fruit: {
-                    name: "水果",
-                    icon: "fa-apple-alt",
-                    meaning: "代表生命与健康，象征自然恩赐。新鲜水果表达对神明的感恩之情，祈求家人健康长寿，生活甜美。"
-                },
-                incense: {
-                    name: "香烛",
-                    icon: "fa-fire",
-                    meaning: "象征光明与指引，净化心灵与空间。焚香产生的烟雾被认为能沟通天地，传达信众的祈愿给神明。"
-                }
-            };
-            
-            const offering = offerings[id] || offerings.wine;
-            
-            document.getElementById('offering-detail-icon').innerHTML = `<i class="fas ${offering.icon}"></i>`;
-            document.getElementById('offering-detail-name').textContent = offering.name;
-            document.getElementById('offering-detail-meaning').textContent = offering.meaning;
-            
-            document.getElementById('offering-modal').style.display = 'flex';
+        function selectOffering(id) {
+            fetch(`/get_offering/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('offering-name').textContent = data.name;
+                    document.getElementById('offering-meaning').textContent = data.meaning;
+                    document.getElementById('offering-modal').style.display = 'block';
+                });
         }
         
         // 仪式流程控制
         function showProcedures() {
-            document.getElementById('procedure-modal').style.display = 'flex';
+            document.getElementById('procedure-modal').style.display = 'block';
         }
-        
-        // 添加仪式步骤点击事件
-        document.querySelectorAll('.procedure-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const type = this.dataset.type;
-                performRitual(type);
-            });
-        });
         
         function performRitual(type) {
             closeModal();
+            const scene = document.querySelector('.ritual-scene');
             
-            if (type === 'music') {
-                // 音乐效果
-                document.getElementById('music-effect').style.opacity = '1';
-                document.getElementById('music-effect').style.pointerEvents = 'all';
-                
-                // 更新进度
-                if (ritualProgress < 2) ritualProgress = 2;
-                updateProgress();
+            if(type === 'music') {
+                // 添加音乐播放反馈
+                scene.style.background = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://via.placeholder.com/800x500?text=祭祀音乐播放中')";
+                scene.innerHTML += `
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
+                        background:rgba(255,255,255,0.9); padding:20px; border-radius:10px; text-align:center;">
+                        <h3>祭祀音乐播放中</h3>
+                        <p>传统道教祭祀乐曲《步虚韵》</p>
+                        <div style="font-size:3rem;">🎵</div>
+                    </div>
+                `;
                 
                 // 3秒后恢复
                 setTimeout(() => {
-                    document.getElementById('music-effect').style.opacity = '0';
-                    document.getElementById('music-effect').style.pointerEvents = 'none';
-                }, 5000);
+                    scene.style.background = "url('https://via.placeholder.com/800x500?text=祭祀场景背景')";
+                    scene.innerHTML = document.querySelector('.ritual-scene').innerHTML;
+                }, 3000);
                 
-            } else if (type === 'kowtow') {
-                // 跪拜效果
-                document.getElementById('kowtow-effect').style.opacity = '1';
-                document.getElementById('kowtow-effect').style.pointerEvents = 'all';
+            } else if(type === 'kowtow') {
+                // 添加跪拜效果
+                scene.style.transform = 'perspective(500px) rotateX(20deg)';
                 
-                // 更新进度
-                if (ritualProgress < 3) ritualProgress = 3;
-                updateProgress();
-                
-            } else if (type === 'pray') {
-                // 诵读祝文效果
-                ritualProgress = 4;
-                updateProgress();
-                
-                // 显示完成状态
-                setTimeout(() => {
-                    ritualProgress = 5;
-                    updateProgress();
-                    
-                    // 显示完成效果
-                    document.querySelector('.effect-content').innerHTML = `
-                        <div class="effect-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <h3 class="effect-title">祭祀完成</h3>
-                        <p class="effect-text">您已成功完成许真君祭祀仪式</p>
-                        <p>愿许真君保佑风调雨顺，国泰民安</p>
-                    `;
-                    
-                    document.getElementById('kowtow-effect').style.opacity = '1';
-                    document.getElementById('kowtow-effect').style.pointerEvents = 'all';
-                }, 1000);
+                // 显示祝词
+                scene.innerHTML += `
+                    <div style="position:absolute; bottom:0; left:0; right:0; 
+                        background:rgba(0,0,0,0.7); color:white; padding:20px; text-align:center;
+                        font-size:1.2rem; line-height:1.6;">
+                        <p>一跪三叩，念诵：</p>
+                        <p style="font-weight:bold; margin-top:10px;">"仰祈真君，福佑江右，<br>水旱不侵，五谷丰登"</p>
+                    </div>
+                `;
             }
         }
-        
-        // 重置仪式
-        function resetRitual() {
-            ritualProgress = 1;
-            updateProgress();
-            document.getElementById('kowtow-effect').style.opacity = '0';
-            document.getElementById('kowtow-effect').style.pointerEvents = 'none';
+        // 添加导航功能
+        function navigateTo(path) {
+            window.location.href = path;
         }
         
         function closeModal() {
-            document.querySelectorAll('.modal').forEach(m => {
-                m.style.display = 'none';
-            });
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.querySelector('.ritual-scene').style.transform = '';
         }
     </script>
 </body>
