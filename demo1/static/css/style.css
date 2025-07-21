@@ -351,3 +351,99 @@ body {
         top: 0;
     }
 }
+
+/* ===== 翻转卡片效果 ===== */
+.timeline-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    perspective: 1000px;
+}
+
+.timeline-item:hover .timeline-card {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 8px;
+    /* box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 15px; */
+    transition: all 0.3s ease;
+}
+
+.card-front {
+    background: #e3f2fd00;
+    z-index: 2;
+}
+
+.card-back {
+    background: #0d48a100;
+    color: white;
+    transform: rotateY(180deg);
+    z-index: 1;
+}
+
+.timeline-item:nth-child(odd) .card-front {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+}
+
+.timeline-item:nth-child(even) .card-front {
+    background: linear-gradient(135deg, #bbdefb, #90caf9);
+}
+
+/* 添加语言提示 */
+.card-front::after {
+    content: "中文 · Hover for English";
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: #555;
+    opacity: 0.7;
+}
+
+.card-back::after {
+    content: "English";
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* 调整时间线项目高度 */
+.timeline-item {
+    padding-bottom: 3.5rem; /* 增加高度以容纳双面内容 */
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .timeline-card {
+        transform: none !important; /* 移动设备禁用翻转 */
+    }
+    
+    .card-back {
+        position: relative;
+        transform: none;
+        margin-top: 10px;
+        display: block;
+    }
+    
+    .card-front::after {
+        display: none;
+    }
+    
+    .timeline-item {
+        padding-bottom: 5rem; /* 移动端需要更多空间 */
+    }
+}
