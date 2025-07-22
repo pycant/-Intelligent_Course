@@ -151,4 +151,272 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    // static/js/main.js 新增功能
+    // 在DOMContentLoaded事件内添加以下代码
+
+    // AI问答功能
+    const aiToggle = document.getElementById('ai-toggle');
+    const aiChatbox = document.querySelector('.ai-chatbox');
+    const closeChat = document.querySelector('.close-chat');
+    const aiSendBtn = document.getElementById('ai-send');
+    const aiQuestionInput = document.getElementById('ai-question');
+    const chatHistory = document.getElementById('chat-history');
+
+    if (aiToggle) {
+        aiToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            aiChatbox.classList.toggle('hidden');
+            aiChatbox.classList.add('active');
+            document.querySelector('.ai-chatbox .chat-input input').focus();
+        });
+    }
+
+    if (closeChat) {
+        closeChat.addEventListener('click', () => {
+            aiChatbox.classList.add('hidden');
+        });
+    }
+
+    if (aiSendBtn) {
+        aiSendBtn.addEventListener('click', sendQuestion);
+        aiQuestionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendQuestion();
+        });
+    }
+
+    function sendQuestion() {
+        const question = aiQuestionInput.value.trim();
+        if (!question) return;
+        
+        // 添加用户消息
+        addMessage(question, 'user');
+        aiQuestionInput.value = '';
+        
+        // 发送到DeepSeek API
+        fetch('/api/ai-answer', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ prompt: question })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.answer) {
+                addMessage(data.answer, 'ai');
+            } else {
+                addMessage("Sorry, I couldn't get an answer. Please try again later.", 'ai');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            addMessage("An error occurred. Please try again.", 'ai');
+        });
+    }
+
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        messageDiv.textContent = text;
+        chatHistory.appendChild(messageDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    // 词汇翻译功能
+    const vocabTranslator = document.querySelector('.vocab-translator');
+    const closeTranslator = document.querySelector('.close-translator');
+    const translatedWord = document.getElementById('translated-word');
+    const aiExplanation = document.getElementById('ai-explanation');
+    const askAiBtn = document.getElementById('ask-ai-btn');
+
+    // 翻译词典
+    const vocabDictionary = {
+        "Qianjinbei": "千金陂 (Ancient stone diversion dam)",
+        "diversion": "导流 (Diverting water flow)",
+        "Fuzhou": "抚州 (City in Jiangxi province)",
+        "Tang Xianzu": "汤显祖 (Ming Dynasty playwright)",
+        "irrigation": "灌溉 (Watering crops)",
+        "hydraulic": "水利的 (Related to water engineering)",
+        "cultural": "文化的 (Related to culture and arts)"
+    };
+
+    // 标记页面中的专业术语
+    document.querySelectorAll('p, h1, h2, h3, li').forEach(element => {
+        const words = element.innerHTML.split(/\b/);
+        element.innerHTML = words.map(word => {
+            const cleanWord = word.replace(/[.,?!;:]/g, '');
+            if (vocabDictionary[cleanWord]) {
+                return `<span class="vocab-word" data-word="${cleanWord}">${word}</span>`;
+            }
+            return word;
+        }).join('');
+    });
+
+    // 绑定词汇点击事件
+    document.querySelectorAll('.vocab-word').forEach(word => {
+        word.addEventListener('click', function() {
+            const term = this.dataset.word;
+            translatedWord.innerHTML = `<strong>${term}</strong>: ${vocabDictionary[term]}`;
+            
+            // 显示AI解释
+            aiExplanation.textContent = "Loading explanation...";
+            vocabTranslator.classList.remove('hidden');
+            
+            // 获取AI解释
+            fetch('/api/ai-answer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    prompt: `Explain the term "${term}" in the context of Jiangxi water culture in 1-2 sentences.`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.answer) {
+                    aiExplanation.textContent = data.answer;
+                } else {
+                    aiExplanation.textContent = "Could not load explanation.";
+                }
+            });
+        });
+    });
+
+    if (closeTranslator) {
+        closeTranslator.addEventListener('click', () => {
+            vocabTranslator.classList.add('hidden');
+        });
+    }
+
+    if (askAiBtn) {
+        askAiBtn.addEventListener('click', () => {
+            const term = document.querySelector('.vocab-word.active')?.dataset.word;
+            if (term) {
+                aiChatbox.classList.remove('hidden');
+                aiQuestionInput.value = `Tell me more about ${term} in Jiangxi water culture`;
+                sendQuestion();
+            }
+        });
+    }
+
+    // 翻译游戏功能
+    const gameOptions = document.querySelectorAll('.options button');
+    const gameFeedback = document.getElementById('game-feedback');
+    let correctAnswers = 0;
+
+    gameOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const isCorrect = this.dataset.correct === 'true';
+            const wordId = this.dataset.id;
+            
+            // 更新UI
+            if (isCorrect) {
+                this.style.backgroundColor = '#4CAF50';
+                this.style.color = 'white';
+                correctAnswers++;
+            } else {
+                this.style.backgroundColor = '#F44336';
+                this.style.color = 'white';
+                // 高亮显示正确答案
+                const correctBtn = document.querySelector(`.options button[data-id="${wordId}"][data-correct="true"]`);
+                if (correctBtn) {
+                    correctBtn.style.backgroundColor = '#4CAF50';
+                    correctBtn.style.color = 'white';
+                }
+            }
+            
+            // 禁用所有选项
+            document.querySelectorAll(`.options button[data-id="${wordId}"]`).forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // 检查游戏完成状态
+            if (correctAnswers === 6) {
+                gameFeedback.classList.remove('hidden');
+                gameFeedback.innerHTML = `
+                    <div class="success-message">✓ Excellent! You found all incorrect translations</div>
+                    <p>Tang Xianzu's poetry captures the essence of water culture in Jiangxi.</p>
+                `;
+            }
+        });
+    });
+
+    // 知识检验功能
+    const quizForm = document.getElementById('quiz-form');
+    const quizResults = document.getElementById('quiz-results');
+
+    if (quizForm) {
+        quizForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 计算选择题和判断题分数
+            let mcScore = 0;
+            let tfScore = 0;
+            
+            // 正确答案
+            const correctAnswers = {
+                q1: 'a',
+                q5: 'true'
+            };
+            
+            // 检查答案
+            for (const [question, correct] of Object.entries(correctAnswers)) {
+                const selected = this.elements[question].value;
+                if (selected === correct) {
+                    if (question.startsWith('q')) mcScore++;
+                    else tfScore++;
+                }
+            }
+            
+            // 显示分数
+            document.getElementById('mc-score').textContent = mcScore;
+            document.getElementById('tf-score').textContent = tfScore;
+            
+            // 处理创作题
+            const creativeAnswer = this.elements['q8'].value;
+            document.getElementById('creative-feedback').innerHTML = `
+                <p>Your answer is being evaluated by AI...</p>
+                <div class="ai-evaluation" id="ai-evaluation"></div>
+            `;
+            
+            // 发送到AI评估
+            fetch('/api/ai-answer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    prompt: `Evaluate this answer about Qianjinbei's cultural impact: "${creativeAnswer}". 
+                    Use a 5-point scale for: Historical accuracy (1-5), Cultural insight (1-5), 
+                    and Language quality (1-5). Provide brief feedback.`
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.answer) {
+                    document.getElementById('ai-evaluation').innerHTML = `
+                        <h4>AI Evaluation:</h4>
+                        <p>${data.answer}</p>
+                    `;
+                }
+            });
+            
+            // 显示结果
+            quizResults.classList.remove('hidden');
+        });
+    }
+
+    // 全景图控制
+    const panLeftBtn = document.querySelector('.pan-left');
+    const panRightBtn = document.querySelector('.pan-right');
+    const panoramaImg = document.querySelector('.panorama-img');
+
+    if (panLeftBtn && panRightBtn) {
+        let panPosition = 0;
+        
+        panLeftBtn.addEventListener('click', () => {
+            panPosition = Math.max(panPosition - 20, 0);
+            panoramaImg.style.transform = `translateX(${panPosition}px)`;
+        });
+        
+        panRightBtn.addEventListener('click', () => {
+            panPosition = Math.min(panPosition + 20, 100);
+            panoramaImg.style.transform = `translateX(${panPosition}px)`;
+        });
+    }
 });

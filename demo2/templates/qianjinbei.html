@@ -108,4 +108,118 @@
         </div>
     </div>
 </section>
+<section class="translation-game">
+    <h2>Poetry Translation Challenge</h2>
+    <p>Find the incorrectly translated words in these Tang Xianzu excerpts:</p>
+    
+    <div class="game-container">
+        <div class="poem-excerpt">
+            <h3>Excerpt 1</h3>
+            <p class="game-line">Where <span class="word-option correct">raging</span> floods were 
+                <span class="word-option wrong">calmed</span> by human hand</p>
+            <div class="options">
+                <button data-id="1-1" data-correct="true">raging</button>
+                <button data-id="1-2" data-correct="false">calmed</button>
+            </div>
+        </div>
+        
+        <div class="poem-excerpt">
+            <h3>Excerpt 2</h3>
+            <p class="game-line">And merchant <span class="word-option correct">boats</span> through 
+                <span class="word-option wrong">violent</span> waters glide</p>
+            <div class="options">
+                <button data-id="2-1" data-correct="true">boats</button>
+                <button data-id="2-2" data-correct="false">violent</button>
+            </div>
+        </div>
+        
+        <div class="poem-excerpt">
+            <h3>Excerpt 3</h3>
+            <p class="game-line">Prosperity flows with the <span class="word-option correct">turning</span> 
+                <span class="word-option wrong">stormy</span> tide</p>
+            <div class="options">
+                <button data-id="3-1" data-correct="true">turning</button>
+                <button data-id="3-2" data-correct="false">stormy</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="game-feedback hidden" id="game-feedback"></div>
+</section>
+
+<!-- 新增学习成果检验部分 -->
+<section class="knowledge-check">
+    <h2>Knowledge Check</h2>
+    <form id="quiz-form">
+        <!-- 选择题 -->
+        <div class="question">
+            <p>1. What was the main engineering principle of Qianjinbei?</p>
+            <label>
+                <input type="radio" name="q1" value="a"> Diverting the river and channeling water
+            </label>
+            <label>
+                <input type="radio" name="q1" value="b"> Building high walls to contain floods
+            </label>
+            <label>
+                <input type="radio" name="q1" value="c"> Creating underground water channels
+            </label>
+        </div>
+        
+        <!-- 判断题 -->
+        <div class="question">
+            <p>5. Tang Xianzu wrote "Ode to the Golden Dam" to praise Qianjinbei. (True/False)</p>
+            <label>
+                <input type="radio" name="q5" value="true"> True
+            </label>
+            <label>
+                <input type="radio" name="q5" value="false"> False
+            </label>
+        </div>
+        
+        <!-- 创作题 -->
+        <div class="question">
+            <p>8. In 2-3 sentences, describe how Qianjinbei contributed to cultural development in Fuzhou.</p>
+            <textarea name="q8" rows="4"></textarea>
+        </div>
+        
+        <button type="submit">Submit Answers</button>
+    </form>
+    
+    <div class="quiz-results hidden" id="quiz-results">
+        <h3>Your Results</h3>
+        <p>Multiple Choice: <span id="mc-score">0</span>/5</p>
+        <p>True/False: <span id="tf-score">0</span>/3</p>
+        <div class="creative-feedback" id="creative-feedback"></div>
+    </div>
+</section>
+
+<!-- 新增3D展示区 -->
+<section class="panorama-showcase">
+    <h2>Immersive Experience: Qianjinbei Panorama</h2>
+    <div class="panorama-container">
+        <img src="{{ url_for('static', filename='imgs/panorama-placeholder.jpg') }}" 
+             alt="Qianjinbei Panoramic View" class="panorama-img">
+        <div class="panorama-controls">
+            <button class="pan-left">◀</button>
+            <button class="pan-right">▶</button>
+        </div>
+    </div>
+    <p class="panorama-caption">Drag or use arrows to explore Qianjinbei site (Actual 3D view will be implemented)</p>
+</section>
 {% endblock %}
+<script>
+// 添加AI助手和翻译器切换逻辑
+function toggleElement(elementId) {
+  const element = document.getElementById(elementId);
+  element.classList.toggle('hidden');
+  element.classList.toggle('show');
+}
+
+document.getElementById('ai-toggle').addEventListener('click', () => toggleElement('ai-chatbox'));
+document.querySelector('.close-chat').addEventListener('click', () => toggleElement('ai-chatbox'));
+
+document.querySelectorAll('.vocab-term').forEach(term => {
+  term.addEventListener('click', () => toggleElement('vocab-translator'));
+});
+document.querySelector('.close-translator').addEventListener('click', () => toggleElement('vocab-translator'));
+</script>
