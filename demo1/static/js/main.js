@@ -34,35 +34,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 时间线动画
     const timelineItems = document.querySelectorAll('.timeline-item');
+    timelineItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.opacity = 1;
+            item.style.transform = 'translateY(0)';
+        }, 300 * index);
+    });
+    
     // 初始设置时间线项目样式
     timelineItems.forEach(item => {
         item.style.opacity = 0;
         item.style.transform = 'translateY(20px)';
         item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        
-        // 为卡片添加轻微旋转效果
-        const card = item.querySelector('.timeline-card');
-        if (card) {
-            card.style.transform = 'rotateY(5deg)';
-            card.style.transition = 'transform 0.5s ease';
-        }
     });
-
-    // 时间线动画
-    timelineItems.forEach((item, index) => {
-        setTimeout(() => {
-            item.style.opacity = 1;
-            item.style.transform = 'translateY(0)';
-            
-            // 卡片旋转复位
-            const card = item.querySelector('.timeline-card');
-            if (card) {
-                setTimeout(() => {
-                    card.style.transform = 'rotateY(0deg)';
-                }, 300);
-            }
-        }, 300 * index);
-    });
+});
 
 // === 增强导航功能 ===
 function navigateTo(path) {
@@ -104,35 +89,4 @@ document.querySelectorAll('.timeline-item').forEach(item => {
             this.style.boxShadow = '';
         }, 300);
     });
-});
-
-// 添加卡片点击事件（移动设备支持）
-document.querySelectorAll('.timeline-card').forEach(card => {
-    card.addEventListener('click', function() {
-        // 在移动设备上切换显示
-        if (window.innerWidth <= 768) {
-            const back = this.querySelector('.card-back');
-            if (back.style.display === 'block') {
-                back.style.display = 'none';
-            } else {
-                back.style.display = 'block';
-            }
-        }
-    });
-});
-
-// 添加卡片悬停效果
-document.querySelectorAll('.timeline-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
-        this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        if (!this.classList.contains('flipped')) {
-            this.style.transform = '';
-            this.style.boxShadow = '';
-        }
-    });
-});
 });
