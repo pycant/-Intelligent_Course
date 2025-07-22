@@ -1,0 +1,190 @@
+/* static/css/main.css */
+:root {
+    --water-blue: #1a6fb0;
+    --heritage-gold: #d4af37;
+    --agriculture-green: #4caf50;
+    --disaster-red: #e74c3c;
+    --stone-gray: #8d6e63;
+    --paper-beige: #f5f1e6;
+}
+
+/* 基础样式 */
+body {
+    font-family: 'Georgia', serif;
+    background-color: #f0f8ff;
+    color: #333;
+    line-height: 1.6;
+}
+
+.water-header {
+    background: linear-gradient(to right, var(--water-blue), #0d47a1);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 3px solid var(--heritage-gold);
+}
+
+.culture-footer {
+    background-color: var(--stone-gray);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+/* 时间轴样式 */
+.timeline-section {
+    background-color: var(--paper-beige);
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.timeline-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 2rem;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: var(--water-blue);
+    z-index: 1;
+}
+
+.timeline-event {
+    position: relative;
+    z-index: 2;
+    width: 23%;
+}
+
+.event-card {
+    background: white;
+    border: 2px solid var(--water-blue);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.flood-event {
+    border-color: var(--disaster-red);
+}
+
+.drag-target {
+    height: 120px;
+    margin-top: 1rem;
+    border: 2px dashed var(--stone-gray);
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.comparison-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 90%;
+    max-width: 800px;
+}
+
+/* 模拟器样式 */
+.simulator-section {
+    background-color: #e3f2fd;
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 1rem;
+}
+
+.simulator-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#river-canvas {
+    background-color: #bbdefb;
+    border: 2px solid var(--water-blue);
+    border-radius: 4px;
+    display: block;
+    margin: 1rem auto;
+}
+
+.controls {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.feedback {
+    margin-top: 1rem;
+}
+
+#result-message {
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 诗歌部分样式 */
+.poetry-section {
+    background-color: var(--paper-beige);
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 1rem;
+}
+
+.poem-display {
+    background: url('/static/imgs/scroll-texture.jpg'); /* TODO: 添加古卷轴纹理 */
+    padding: 2rem;
+    border-radius: 4px;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.poem-line {
+    margin: 0.5rem 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.poem-line:hover {
+    background-color: rgba(212, 175, 55, 0.1);
+}
+
+.keyword-selector {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+#custom-poem {
+    background-color: #fffde7;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border-left: 4px solid var(--heritage-gold);
+    font-style: italic;
+    white-space: pre-line;
+}

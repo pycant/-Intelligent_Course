@@ -1,0 +1,111 @@
+<!-- templates/qianjinbei.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<section id="timeline" class="timeline-section">
+    <h2>Evolution of Qianjinbei Dam</h2>
+    <div class="timeline-container">
+        <div class="timeline-event" data-year="9th">
+            <div class="event-card">
+                <h3>Initial Construction</h3>
+                <p>Temporary wooden structure built</p>
+            </div>
+        </div>
+        <div class="timeline-event" data-year="15th">
+            <div class="event-card flood-event">
+                <h3>Great Flood Disaster</h3>
+                <p>Dam collapse causing years of flooding</p>
+                <button class="compare-btn">See Comparison</button>
+            </div>
+        </div>
+        <div class="timeline-event" data-year="16th">
+            <div class="event-card">
+                <h3>Stone Reconstruction</h3>
+                <p>Granite blocks from Zhejiang experts</p>
+                <div class="drag-target" id="dam-target">
+                    <!-- 缺失素材注释 -->
+                    <!-- TODO: 添加砌石结构占位图 -->
+                    <div class="placeholder-img">Drag stones here</div>
+                </div>
+            </div>
+        </div>
+        <div class="timeline-event" data-year="Modern">
+            <div class="event-card">
+                <h3>World Heritage Site</h3>
+                <p>"Dujiangyan of Jiangxi"</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="comparison-modal hidden">
+        <div class="flood-scene">
+            <h4>15th Century Flooding</h4>
+            <div class="damage-display"></div>
+        </div>
+        <div class="rebuilt-scene">
+            <h4>16th Century Solution</h4>
+            <div class="success-display"></div>
+        </div>
+        <button class="close-modal">Close</button>
+    </div>
+</section>
+
+<section id="simulator" class="simulator-section">
+    <h2>Diversion Dam Simulator</h2>
+    <div class="engineering-principle">
+        <p><strong>"Divert the river and channel water"</strong> - Ancient technique</p>
+    </div>
+    
+    <div class="simulator-container">
+        <canvas id="river-canvas" width="800" height="400"></canvas>
+        <div class="controls">
+            <label>Dam Angle: <span id="angle-value">45°</span></label>
+            <input type="range" id="dam-angle" min="0" max="90" value="45">
+            
+            <label>Dam Position: <span id="position-value">50%</span></label>
+            <input type="range" id="dam-position" min="10" max="90" value="50">
+            
+            <button id="simulate-btn">Start Simulation</button>
+        </div>
+        
+        <div class="feedback">
+            <div class="flow-meter">
+                <span>Main River Flow: </span>
+                <progress id="main-flow" value="50" max="100"></progress>
+                <span id="flow-percent">50%</span>
+            </div>
+            <div id="result-message" class="hidden"></div>
+        </div>
+    </div>
+</section>
+
+<section id="poetry" class="poetry-section">
+    <h2>Tang Xianzu's Water Poetry</h2>
+    <div class="poetry-container">
+        <div class="poem-display">
+            <h3>"Ode to the Golden Dam" Excerpt</h3>
+            <p class="poem-line" data-term="flood">Where raging floods were tamed by human hand</p>
+            <p class="poem-line" data-term="irrigation">The fields drink deep from river's rich command</p>
+            <p class="poem-line" data-term="navigation">And merchant boats through calmer waters glide</p>
+            <p class="poem-line">Prosperity flows with the turning tide</p>
+        </div>
+        
+        <div class="poetry-creation">
+            <h3>Create Your Water Poem</h3>
+            <div class="keyword-selector">
+                <label>
+                    <input type="checkbox" name="keyword" value="flood"> Flood Control
+                </label>
+                <label>
+                    <input type="checkbox" name="keyword" value="irrigation"> Irrigation
+                </label>
+                <label>
+                    <input type="checkbox" name="keyword" value="navigation"> Navigation
+                </label>
+            </div>
+            <button id="generate-poem">Generate Poem</button>
+            <div id="custom-poem" class="hidden"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
