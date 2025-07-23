@@ -2,6 +2,7 @@
 from flask import Flask, render_template, jsonify, request
 import requests
 
+
 app = Flask(__name__)
 DEEPSEEK_API_KEY = "sk-f5aa3e02b1c94e0899b9423b69ef6a48"
 

@@ -1,43 +1,415 @@
-<!-- templates/qianjinbei.html -->
 {% extends "base.html" %}
 
 {% block content %}
-<section id="timeline" class="timeline-section">
-    <h2>Evolution of Qianjinbei Dam</h2>
-    <div class="timeline-container">
-        <div class="timeline-event" data-year="9th">
-            <div class="event-card">
-                <h3>Initial Construction</h3>
-                <p>Temporary wooden structure built</p>
-            </div>
-        </div>
-        <div class="timeline-event" data-year="15th">
-            <div class="event-card flood-event">
-                <h3>Great Flood Disaster</h3>
-                <p>Dam collapse causing years of flooding</p>
-                <button class="compare-btn">See Comparison</button>
-            </div>
-        </div>
-        <div class="timeline-event" data-year="16th">
-            <div class="event-card">
-                <h3>Stone Reconstruction</h3>
-                <p>Granite blocks from Zhejiang experts</p>
-                <div class="drag-target" id="dam-target">
-                    <!-- 缺失素材注释 -->
-                    <!-- TODO: 添加砌石结构占位图 -->
-                    <div class="placeholder-img">Drag stones here</div>
+<style>
+    /* 全局样式优化 */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        background-color: #f8f9fa;
+    }
+    
+    /* 章节公共样式 */
+    section {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    /* 章节内容容器 */
+    .section-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 1200px;
+        background-color: rgba(255, 255, 255, 0.92);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        z-index: 10;
+    }
+    
+    /* 章节标题样式 */
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #1a645c;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: #d4af37;
+        border-radius: 2px;
+    }
+    
+    /* 时间线样式 */
+    .timeline-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+    }
+    
+    .timeline-event {
+        position: relative;
+        padding: 25px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+        border-left: 4px solid #d4af37;
+    }
+    
+    .timeline-event:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    timeline-event:before {
+        content: attr(data-index) !important; /* 使用数据索引作为内容 */
+        display: flex !important; /* 强制显示 */
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        background: #d4af37;
+        color: white;
+        font-weight: bold;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 20;
+    }
+    
+    /* 如果之前有隐藏样式，需要覆盖 */
+    .timeline-event:before {
+        display: flex !important; /* 确保显示 */
+    }
+    
+    /* 保持两列布局 */
+    .timeline-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .event-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .event-card h3 {
+        font-size: 1.5rem;
+        color: #1a645c;
+        margin-bottom: 10px;
+    }
+    
+    .event-card p {
+        margin-bottom: 15px;
+        color: #555;
+    }
+    
+  .event-card img {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .event-card img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 8px;
+        margin: 10px 0;
+        border: 2px solid #e6c567;
+        display: block;
+    }
+    
+    /* 加宽拖拽区域 */
+    .drag-target {
+        min-height: 180px;
+        position: relative;
+        padding: 15px; /* 增加内边距使区域更宽 */
+        background-color: #f8f8f8; /* 添加背景色突出区域 */
+        border-radius: 8px;
+        border: 1px dashed #d4af37; /* 添加虚线边框 */
+    }
+    
+    .placeholder-img {
+   Cell In[46], line 1 def information(age=18,name): ^ SyntaxError: parameter without a default follows parameter with a default
+    
+    .flow-meter span {
+        width: 150px;
+        font-weight: 600;
+    }
+    
+    progress {
+        flex-grow: 1;
+        height: 20px;
+        border-radius: 10px;
+        margin: 0 10px;
+    }
+    
+    /* 诗歌部分样式 */
+    .poetry-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    
+    @media (max-width: 768px) {
+        .poetry-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .poem-display {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #d4af37;
+    }
+    
+    .poem-line {
+        padding: 10px 0;
+        border-bottom: 1px dashed #e0e0e0;
+        font-size: 1.1rem;
+        font-style: italic;
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .poem-line:before {
+        content: "❝";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        color: #d4af37;
+        font-size: 1.5rem;
+    }
+    
+    .poetry-creation {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #1a645c;
+    }
+    
+    .keyword-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .keyword-selector label {
+        display: flex;
+        align-items: center;
+        font-weight: normal;
+        cursor: pointer;
+    }
+    
+    .keyword-selector input {
+        margin-right: 10px;
+        width: 20px;
+        height: 20px;
+    }
+    
+    #generate-poem {
+        background: #1a645c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: block;
+        width: 100%;
+    }
+    
+    #generate-poem:hover {
+        background: #0d3b2e;
+    }
+    
+    /* 导航按钮 */
+    .floating-nav {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .nav-btn {
+        background: #1a645c;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .nav-btn:hover {
+        background: #0d3b2e;
+        transform: translateY(-3px);
+    }
+    
+    /* 模态框样式 */
+    .comparison-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 900px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        z-index: 1000;
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    
+    .comparison-modal.visible {
+        display: grid;
+    }
+    
+    .flood-scene, .rebuilt-scene {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .flood-scene {
+        background-color: #ffebee;
+    }
+    
+    .rebuilt-scene {
+        background-color: #e8f5e9;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #f44336;
+        color: white;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .section-container {
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .timeline-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .comparison-modal {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- 浮动导航 -->
+<div class="floating-nav">
+    <button class="nav-btn" onclick="scrollToSection('timeline')">1</button>
+    <button class="nav-btn" onclick="scrollToSection('simulator')">2</button>
+    <button class="nav-btn" onclick="scrollToSection('poetry')">3</button>
+</div>
+
+<!-- 历史时间线部分 -->
+<section id="timeline" class="timeline-section" 
+         style="background-image: url({{url_for('static', filename='imgs/1.jpg') }});">
+    <div class="section-overlay"></div>
+    <div class="section-container">
+        <h2 class="section-title">Historical Timeline</h2>
+        <div class="timeline-container">
+            <div class="timeline-event" data-year="9th">
+                <div class="event-card">
+                    <h3>Initial Construction</h3>
+                    <p>Temporary wooden structure built</p>
+                    <img src="{{ url_for('static', filename='imgs/4.jpg') }}">
                 </div>
             </div>
-        </div>
-        <div class="timeline-event" data-year="Modern">
-            <div class="event-card">
-                <h3>World Heritage Site</h3>
-                <p>"Dujiangyan of Jiangxi"</p>
+            <div class="timeline-event" data-year="15th">
+                <div class="event-card flood-event">
+                    <h3>Great Flood Disaster</h3>
+                    <p>Dam collapse causing years of flooding</p>
+                    <img src="{{ url_for('static', filename='imgs/5.png') }}">
+                    <button class="compare-btn">See Comparison</button>
+                </div>
+            </div>
+            <div class="timeline-event" data-year="16th">
+                <div class="event-card">
+                    <h3>Stone Reconstruction</h3>
+                    <p>Granite blocks from Zhejiang experts</p>
+                    <div class="drag-target" id="dam-target">
+                        <img src="{{ url_for('static', filename='imgs/1.jpg') }}">
+                        <div class="placeholder-img">Drag stones here</div>
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-event" data-year="Modern">
+                <div class="event-card">
+                    <h3>World Heritage Site</h3>
+                    <p>"Dujiangyan of Jiangxi"</p>
+                    <img src="{{ url_for('static', filename='imgs/3.webp') }}">
+                </div>
             </div>
         </div>
     </div>
     
-    <div class="comparison-modal hidden">
+    <div class="comparison-modal">
         <div class="flood-scene">
             <h4>15th Century Flooding</h4>
             <div class="damage-display"></div>
@@ -46,180 +418,241 @@
             <h4>16th Century Solution</h4>
             <div class="success-display"></div>
         </div>
-        <button class="close-modal">Close</button>
+        <button class="close-modal">×</button>
     </div>
 </section>
 
-<section id="simulator" class="simulator-section">
-    <h2>Diversion Dam Simulator</h2>
-    <div class="engineering-principle">
-        <p><strong>"Divert the river and channel water"</strong> - Ancient technique</p>
-    </div>
-    
-    <div class="simulator-container">
-        <canvas id="river-canvas" width="800" height="400"></canvas>
-        <div class="controls">
-            <label>Dam Angle: <span id="angle-value">45°</span></label>
-            <input type="range" id="dam-angle" min="0" max="90" value="45">
+<!-- 模拟器部分 -->
+<section id="simulator" class="simulator-section"
+         style="background-image: url({{url_for('static', filename='imgs/2.jpg') }});">
+    <div class="section-overlay"></div>
+    <div class="section-container">
+        <h2 class="section-title">Diversion Dam Simulator</h2>
+        <div class="engineering-principle">
+            <p><strong>"Divert the river and channel water"</strong> - Ancient technique</p>
+        </div>
+        
+        <div class="simulator-container">
+            <canvas id="river-canvas" width="800" height="400"></canvas>
+            <div class="controls">
+                <div class="control-group">
+                    <label>Dam Angle: <span id="angle-value">45°</span></label>
+                    <input type="range" id="dam-angle" min="0" max="90" value="45">
+                </div>
+                
+                <div class="control-group">
+                    <label>Dam Position: <span id="position-value">50%</span></label>
+                    <input type="range" id="dam-position" min="10" max="90" value="50">
+                </div>
+                
+                <button id="simulate-btn">Start Simulation</button>
+            </div>
             
-            <label>Dam Position: <span id="position-value">50%</span></label>
-            <input type="range" id="dam-position" min="10" max="90" value="50">
+            <div class="feedback">
+                <div class="flow-meter">
+                    <span>Main River Flow: </span>
+                    <progress id="main-flow" value="50" max="100"></progress>
+                    <span id="flow-percent">50%</span>
+                </div>
+                <div id="result-message" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 诗歌部分 -->
+<section id="poetry" class="poetry-section"
+         style="background-image: url({{url_for('static', filename='imgs/4.jpg') }});">
+    <div class="section-overlay"></div>
+    <div class="section-container">
+        <h2 class="section-title">Tang Xianzu's Water Poetry</h2>
+        <div class="poetry-container">
+            <div class="poem-display">
+                <h3>"Ode to the Golden Dam" Excerpt</h3>
+                <p class="poem-line" data-term="flood">Where raging floods were tamed by human hand</p>
+                <p class="poem-line" data-term="irrigation">The fields drink deep from river's rich command</p>
+                <p class="poem-line" data-term="navigation">And merchant boats through calmer waters glide</p>
+                <p class="poem-line">Prosperity flows with the turning tide</p>
+            </div>
             
-            <button id="simulate-btn">Start Simulation</button>
-        </div>
-        
-        <div class="feedback">
-            <div class="flow-meter">
-                <span>Main River Flow: </span>
-                <progress id="main-flow" value="50" max="100"></progress>
-                <span id="flow-percent">50%</span>
+            <div class="poetry-creation">
+                <h3>Create Your Water Poem</h3>
+                <div class="keyword-selector">
+                    <label>
+                        <input type="checkbox" name="keyword" value="flood"> Flood Control
+                    </label>
+                    <label>
+                        <input type="checkbox" name="keyword" value="irrigation"> Irrigation
+                    </label>
+                    <label>
+                        <input type="checkbox" name="keyword" value="navigation"> Navigation
+                    </label>
+                </div>
+                <button id="generate-poem">Generate Poem</button>
+                <div id="custom-poem" class="hidden"></div>
             </div>
-            <div id="result-message" class="hidden"></div>
         </div>
     </div>
 </section>
 
-<section id="poetry" class="poetry-section">
-    <h2>Tang Xianzu's Water Poetry</h2>
-    <div class="poetry-container">
-        <div class="poem-display">
-            <h3>"Ode to the Golden Dam" Excerpt</h3>
-            <p class="poem-line" data-term="flood">Where raging floods were tamed by human hand</p>
-            <p class="poem-line" data-term="irrigation">The fields drink deep from river's rich command</p>
-            <p class="poem-line" data-term="navigation">And merchant boats through calmer waters glide</p>
-            <p class="poem-line">Prosperity flows with the turning tide</p>
-        </div>
-        
-        <div class="poetry-creation">
-            <h3>Create Your Water Poem</h3>
-            <div class="keyword-selector">
-                <label>
-                    <input type="checkbox" name="keyword" value="flood"> Flood Control
-                </label>
-                <label>
-                    <input type="checkbox" name="keyword" value="irrigation"> Irrigation
-                </label>
-                <label>
-                    <input type="checkbox" name="keyword" value="navigation"> Navigation
-                </label>
-            </div>
-            <button id="generate-poem">Generate Poem</button>
-            <div id="custom-poem" class="hidden"></div>
-        </div>
-    </div>
-</section>
-<section class="translation-game">
-    <h2>Poetry Translation Challenge</h2>
-    <p>Find the incorrectly translated words in these Tang Xianzu excerpts:</p>
-    
-    <div class="game-container">
-        <div class="poem-excerpt">
-            <h3>Excerpt 1</h3>
-            <p class="game-line">Where <span class="word-option correct">raging</span> floods were 
-                <span class="word-option wrong">calmed</span> by human hand</p>
-            <div class="options">
-                <button data-id="1-1" data-correct="true">raging</button>
-                <button data-id="1-2" data-correct="false">calmed</button>
-            </div>
-        </div>
-        
-        <div class="poem-excerpt">
-            <h3>Excerpt 2</h3>
-            <p class="game-line">And merchant <span class="word-option correct">boats</span> through 
-                <span class="word-option wrong">violent</span> waters glide</p>
-            <div class="options">
-                <button data-id="2-1" data-correct="true">boats</button>
-                <button data-id="2-2" data-correct="false">violent</button>
-            </div>
-        </div>
-        
-        <div class="poem-excerpt">
-            <h3>Excerpt 3</h3>
-            <p class="game-line">Prosperity flows with the <span class="word-option correct">turning</span> 
-                <span class="word-option wrong">stormy</span> tide</p>
-            <div class="options">
-                <button data-id="3-1" data-correct="true">turning</button>
-                <button data-id="3-2" data-correct="false">stormy</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="game-feedback hidden" id="game-feedback"></div>
-</section>
-
-<!-- 新增学习成果检验部分 -->
-<section class="knowledge-check">
-    <h2>Knowledge Check</h2>
-    <form id="quiz-form">
-        <!-- 选择题 -->
-        <div class="question">
-            <p>1. What was the main engineering principle of Qianjinbei?</p>
-            <label>
-                <input type="radio" name="q1" value="a"> Diverting the river and channeling water
-            </label>
-            <label>
-                <input type="radio" name="q1" value="b"> Building high walls to contain floods
-            </label>
-            <label>
-                <input type="radio" name="q1" value="c"> Creating underground water channels
-            </label>
-        </div>
-        
-        <!-- 判断题 -->
-        <div class="question">
-            <p>5. Tang Xianzu wrote "Ode to the Golden Dam" to praise Qianjinbei. (True/False)</p>
-            <label>
-                <input type="radio" name="q5" value="true"> True
-            </label>
-            <label>
-                <input type="radio" name="q5" value="false"> False
-            </label>
-        </div>
-        
-        <!-- 创作题 -->
-        <div class="question">
-            <p>8. In 2-3 sentences, describe how Qianjinbei contributed to cultural development in Fuzhou.</p>
-            <textarea name="q8" rows="4"></textarea>
-        </div>
-        
-        <button type="submit">Submit Answers</button>
-    </form>
-    
-    <div class="quiz-results hidden" id="quiz-results">
-        <h3>Your Results</h3>
-        <p>Multiple Choice: <span id="mc-score">0</span>/5</p>
-        <p>True/False: <span id="tf-score">0</span>/3</p>
-        <div class="creative-feedback" id="creative-feedback"></div>
-    </div>
-</section>
-
-<!-- 新增3D展示区 -->
-<section class="panorama-showcase">
-    <h2>Immersive Experience: Qianjinbei Panorama</h2>
-    <div class="panorama-container">
-        <img src="{{ url_for('static', filename='imgs/panorama-placeholder.jpg') }}" 
-             alt="Qianjinbei Panoramic View" class="panorama-img">
-        <div class="panorama-controls">
-            <button class="pan-left">◀</button>
-            <button class="pan-right">▶</button>
-        </div>
-    </div>
-    <p class="panorama-caption">Drag or use arrows to explore Qianjinbei site (Actual 3D view will be implemented)</p>
-</section>
-{% endblock %}
 <script>
-// 添加AI助手和翻译器切换逻辑
-function toggleElement(elementId) {
-  const element = document.getElementById(elementId);
-  element.classList.toggle('hidden');
-  element.classList.toggle('show');
-}
-
-document.getElementById('ai-toggle').addEventListener('click', () => toggleElement('ai-chatbox'));
-document.querySelector('.close-chat').addEventListener('click', () => toggleElement('ai-chatbox'));
-
-document.querySelectorAll('.vocab-term').forEach(term => {
-  term.addEventListener('click', () => toggleElement('vocab-translator'));
-});
-document.querySelector('.close-translator').addEventListener('click', () => toggleElement('vocab-translator'));
+    // 导航滚动功能
+    function scrollToSection(sectionId) {
+        document.getElementById(sectionId).scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+    
+    // 模拟器控制功能
+    const damAngle = document.getElementById('dam-angle');
+    const damPosition = document.getElementById('dam-position');
+    const angleValue = document.getElementById('angle-value');
+    const positionValue = document.getElementById('position-value');
+    const simulateBtn = document.getElementById('simulate-btn');
+    const mainFlow = document.getElementById('main-flow');
+    const flowPercent = document.getElementById('flow-percent');
+    const resultMessage = document.getElementById('result-message');
+    
+    // 更新水坝角度
+    damAngle.addEventListener('input', function() {
+        const angle = this.value;
+        angleValue.textContent = `${angle}°`;
+        drawCanvas(angle, damPosition.value);
+    });
+    
+    // 更新水坝位置
+    damPosition.addEventListener('input', function() {
+        const position = this.value;
+        positionValue.textContent = `${position}%`;
+        drawCanvas(damAngle.value, position);
+    });
+    
+    // 初始化画布
+    const canvas = document.getElementById('river-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    function drawCanvas(angle, position) {
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 绘制河流
+        ctx.fillStyle = '#5d9cec';
+        ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+        
+        // 绘制水坝
+        const damX = (position / 100) * canvas.width;
+        ctx.save();
+        ctx.translate(damX, canvas.height - 80);
+        ctx.rotate(-angle * Math.PI / 180);
+        ctx.fillStyle = '#d4af37';
+        ctx.fillRect(0, 0, 20, -120);
+        ctx.restore();
+        
+        // 绘制水流
+        ctx.fillStyle = 'rgba(93, 156, 236, 0.7)';
+        ctx.beginPath();
+        ctx.moveTo(damX, canvas.height - 80);
+        ctx.lineTo(damX + 100, canvas.height - 180);
+        ctx.lineTo(damX + 150, canvas.height - 180);
+        ctx.lineTo(damX + 50, canvas.height - 80);
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    // 初始绘制
+    drawCanvas(45, 50);
+    
+    // 模拟功能
+    simulateBtn.addEventListener('click', function() {
+        const angle = parseInt(damAngle.value);
+        const position = parseInt(damPosition.value);
+        
+        // 计算效率（示例计算）
+        let efficiency = 50;
+        if (angle > 30 && angle < 60) efficiency += 20;
+        if (position > 40 && position < 60) efficiency += 15;
+        
+        // 限制在100以内
+        efficiency = Math.min(efficiency, 100);
+        
+        // 更新UI
+        mainFlow.value = efficiency;
+        flowPercent.textContent = `${efficiency}%`;
+        
+        // 显示结果消息
+        if (efficiency > 80) {
+            resultMessage.textContent = "Excellent! The dam is effectively controlling water flow and preventing floods.";
+            resultMessage.style.color = "#2a7d62";
+        } else if (efficiency > 60) {
+            resultMessage.textContent = "Good configuration. The dam is working adequately but could be optimized.";
+            resultMessage.style.color = "#d4af37";
+        } else {
+            resultMessage.textContent = "Needs improvement. Adjust the dam to better control water flow and prevent flooding.";
+            resultMessage.style.color = "#c44";
+        }
+        resultMessage.classList.remove('hidden');
+    });
+    
+    // 诗歌生成功能
+    const generateBtn = document.getElementById('generate-poem');
+    const customPoem = document.getElementById('custom-poem');
+    
+    generateBtn.addEventListener('click', function() {
+        const selectedKeywords = Array.from(document.querySelectorAll('input[name="keyword"]:checked'))
+            .map(checkbox => checkbox.value);
+        
+        if (selectedKeywords.length === 0) {
+            customPoem.innerHTML = "<p>Please select at least one theme to generate a poem.</p>";
+            customPoem.classList.remove('hidden');
+            return;
+        }
+        
+        // 生成诗歌（简化版）
+        let poemLines = [];
+        
+        if (selectedKeywords.includes('flood')) {
+            poemLines.push("The raging waters meet their match,");
+            poemLines.push("Human ingenuity turns the tide,");
+        }
+        
+        if (selectedKeywords.includes('irrigation')) {
+            poemLines.push("Life-giving streams to fields now flow,");
+            poemLines.push("Where golden harvests soon will grow,");
+        }
+        
+        if (selectedKeywords.includes('navigation')) {
+            poemLines.push("Smooth currents carry trade and wealth,");
+            poemLines.push("Connecting lands for common health,");
+        }
+        
+        // 添加通用结尾
+        poemLines.push("The river's power wisely used,");
+        poemLines.push("For generations to come, bemused.");
+        
+        // 显示诗歌
+        customPoem.innerHTML = '<h3>Your Custom Water Poem</h3>' + 
+            poemLines.map(line => `<p class="poem-line">${line}</p>`).join('');
+        customPoem.classList.remove('hidden');
+    });
+    
+    // 比较模态框功能
+    const compareBtn = document.querySelector('.compare-btn');
+    const comparisonModal = document.querySelector('.comparison-modal');
+    const closeModal = document.querySelector('.close-modal');
+    
+    compareBtn.addEventListener('click', function() {
+        comparisonModal.classList.add('visible');
+    });
+    
+    closeModal.addEventListener('click', function() {
+        comparisonModal.classList.remove('visible');
+    });
+    
+    // 点击模态框外部关闭
+    window.addEventListener('click', function(event) {
+        if (event.target === comparisonModal) {
+            comparisonModal.classList.remove('visible');
+        }
+    });
 </script>
+{% endblock %}
