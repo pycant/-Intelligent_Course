@@ -16,7 +16,7 @@
 .ai-chatbox,
 .vocab-translator {
   transition: all 0.3s ease-in-out;
-  opacity: 0;
+  /* opacity: 0; */
   transform: translateY(20px);
 }
 
@@ -33,6 +33,16 @@ body {
     color: #333;
     line-height: 1.6;
 }
+
+header {
+    background: linear-gradient(to right, var(--water-blue), #0d47a1);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 3px solid var(--heritage-gold);
+    border-radius: 8px;
+}
+
 
 .water-header {
     background: linear-gradient(to right, var(--water-blue), #0d47a1);
@@ -234,6 +244,7 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
+    overflow: visible;
 }
 
 .chat-header {
@@ -440,6 +451,8 @@ body {
 .ai-chatbox .chat-input input:focus {
     outline: 2px solid var(--water-blue);
     box-shadow: 0 0 8px rgba(26, 111, 176, 0.3);
+    z-index: 1001;
+    position: relative;
 }
 /* 词汇翻译器 */
 .vocab-translator {
@@ -593,5 +606,106 @@ body {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+    cursor: pointer;
+}
+
+.message.loading {
+    color: #888;
+    font-style: italic;
+}
+
+/* 添加拖拽手柄样式 */
+.drag-handle {
+    cursor: grab;
+    padding: 0 10px;
+    user-select: none;
+}
+
+/* 语言选择器 */
+.language-selector select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: white;
+}
+
+/* 消息样式增强 */
+.message {
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 18px;
+    max-width: 85%;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user {
+    background: #e3f2fd;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.message.ai {
+    background: #f5f5f5;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.message.loading {
+    color: #888;
+    font-style: italic;
+}
+
+.message.success {
+    background: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+}
+
+.message.error {
+    background: #ffebee;
+    border-left: 4px solid #F44336;
+}
+
+.message.info {
+    background: #e3f2fd;
+    border-left: 4px solid #2196F3;
+}
+
+/* 翻译结果样式 */
+.translation-result {
+    background: #fffde7;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    border-left: 3px solid #ffd600;
+}
+
+/* 代码块样式 */
+pre code {
+    display: block;
+    padding: 10px;
+    background: #2d2d2d;
+    color: #f8f8f2;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* 测试按钮 */
+.test-btn {
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 12px;
     cursor: pointer;
 }

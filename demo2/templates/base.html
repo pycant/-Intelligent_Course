@@ -10,32 +10,42 @@
     <!-- TODO: 添加历史洪水音效文件 -->
     <!-- TODO: 添加砌石结构高清剖面图 -->
 </head>
-<div class="ai-assistant">
-    <button id="ai-toggle">Ask AI</button>
-    <div class="ai-chatbox hidden">
-        <div class="chat-header">
-            <h3>Water Culture Assistant</h3>
-            <button class="close-chat">×</button>
-        </div>
-        <div class="chat-history" id="chat-history"></div>
-        <div class="chat-input">
-            <input type="text" id="ai-question" placeholder="Ask about water culture or Tang Xianzu...">
-            <button id="ai-send">Send</button>
-        </div>
-    </div>
-</div>
 
-<!-- 新增词汇翻译容器 -->
-<div class="vocab-translator hidden">
-    <div class="translator-header">
-        <h4>Vocabulary Translation</h4>
-        <button class="close-translator">×</button>
-    </div>
-    <div class="translated-word" id="translated-word"></div>
-    <div class="ai-explanation" id="ai-explanation"></div>
-    <button class="ask-ai" id="ask-ai-btn">Ask AI for more</button>
-</div>
 <body>
+    <div class="ai-assistant">
+        <button id="ai-toggle">Ask AI</button>
+        <div class="ai-chatbox hidden">
+            <div class="chat-header">
+                <div class="drag-handle">☰</div> 
+                <h3>Water Culture Assistant</h3>
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
+                <button class="close-chat">×</button>
+            </div>
+            <div class="chat-history" id="chat-history"></div>
+            <div class="chat-input">
+                <input type="text" id="ai-question" placeholder="Ask about water culture or Tang Xianzu...">
+                <button id="ai-send">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增词汇翻译容器 -->
+    <div class="vocab-translator hidden">
+        <div class="translator-header">
+            <h4>Vocabulary Translation</h4>
+            <button class="close-translator">×</button>
+        </div>
+        <div class="translated-word" id="translated-word"></div>
+        <div class="ai-explanation" id="ai-explanation"></div>
+        <button class="ask-ai" id="ask-ai-btn">Ask AI for more</button>
+    </div>
     <header class="water-header">
         <h1>Qianjinbei: The Ancient Dam of Fushui River</h1>
         <nav>

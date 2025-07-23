@@ -22,13 +22,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // 砌石结构拖拽交互
     const dragTarget = document.getElementById('dam-target');
     if (dragTarget) {
+        // 在砌石结构拖拽处添加视觉反馈
         dragTarget.addEventListener('dragover', function(e) {
             e.preventDefault();
-            this.style.backgroundColor = '#e0e0e0';
+            this.style.border = '2px dashed #4CAF50';
+            this.style.backgroundColor = '#e8f5e9';
         });
-        
+
         dragTarget.addEventListener('dragleave', function() {
-            this.style.backgroundColor = '';
+            this.style.border = '2px dashed var(--stone-gray)';
+            this.style.backgroundColor = '#f9f9f9';
         });
         
         dragTarget.addEventListener('drop', function(e) {
@@ -36,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.backgroundColor = '';
             this.innerHTML = '<div class="success-message">✓ Stone Structure Secured</div>';
             // TODO: 添加砌石结构图
+            
         });
     }
     
@@ -155,12 +159,55 @@ document.addEventListener('DOMContentLoaded', function() {
     // 在DOMContentLoaded事件内添加以下代码
 
     // AI问答功能
+    let isDragging = false;
+    let offsetX, offsetY;
     const aiToggle = document.getElementById('ai-toggle');
     const aiChatbox = document.querySelector('.ai-chatbox');
     const closeChat = document.querySelector('.close-chat');
     const aiSendBtn = document.getElementById('ai-send');
     const aiQuestionInput = document.getElementById('ai-question');
     const chatHistory = document.getElementById('chat-history');
+    const dragHandle = document.querySelector('.drag-handle');
+
+    if (dragHandle && aiChatbox) {
+        dragHandle.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', endDrag);
+        
+        function startDrag(e) {
+            isDragging = true;
+            offsetX = e.clientX - aiChatbox.getBoundingClientRect().left;
+            offsetY = e.clientY - aiChatbox.getBoundingClientRect().top;
+            aiChatbox.style.cursor = 'grabbing';
+        }
+        
+        function drag(e) {
+            if (!isDragging) return;
+            aiChatbox.style.left = (e.clientX - offsetX) + 'px';
+            aiChatbox.style.top = (e.clientY - offsetY) + 'px';
+        }
+        
+        function endDrag() {
+            isDragging = false;
+            aiChatbox.style.cursor = 'default';
+        }
+    }
+
+    const testConnectionBtn = document.getElementById('test-connection');
+    if (testConnectionBtn) {
+        testConnectionBtn.addEventListener('click', testConnection);
+    }
+
+    // 多语言支持
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            const lang = this.value;
+            localStorage.setItem('preferredLanguage', lang);
+            addMessage(`Language changed to ${getLanguageName(lang)}`, 'ai info');
+        });
+    }
+
 
     if (aiToggle) {
         aiToggle.addEventListener('click', (e) => {
@@ -184,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 消息处理增强
     function sendQuestion() {
         const question = aiQuestionInput.value.trim();
         if (!question) return;
@@ -192,34 +240,228 @@ document.addEventListener('DOMContentLoaded', function() {
         addMessage(question, 'user');
         aiQuestionInput.value = '';
         
-        // 发送到DeepSeek API
+        // 检查特殊命令
+        if (question.toLowerCase().startsWith('translate:')) {
+            const text = question.substring(10).trim();
+            handleTranslationRequest(text, getCurrentLanguage());
+            return;
+        }
+        
+        if (question.toLowerCase().startsWith('test connection')) {
+            testConnection();
+            return;
+        }
+        
+        // 添加等待消息
+        const waitingMsg = addMessage("Thinking...", 'ai loading');
+        
+        // 发送到AI API
         fetch('/api/ai-answer', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ prompt: question })
+            body: JSON.stringify({ 
+                prompt: question,
+                language: getCurrentLanguage(),
+                context: getChatContext() // 添加上下文
+            })
         })
         .then(response => response.json())
         .then(data => {
+            // 移除等待消息
+            waitingMsg.remove();
+            
             if (data.answer) {
                 addMessage(data.answer, 'ai');
+                saveToHistory(question, data.answer);
             } else {
-                addMessage("Sorry, I couldn't get an answer. Please try again later.", 'ai');
+                addMessage("Sorry, I couldn't get an answer. Please try again later.", 'ai error');
             }
         })
         .catch(error => {
+            waitingMsg.remove();
             console.error('Error:', error);
-            addMessage("An error occurred. Please try again.", 'ai');
+            addMessage("An error occurred. Please try again.", 'ai error');
         });
     }
 
+    // 改进的消息添加函数
     function addMessage(text, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', sender);
-        messageDiv.textContent = text;
+        
+        // 格式化AI响应
+        if (sender.startsWith('ai') && text.includes('```')) {
+            const parts = text.split('```');
+            let formattedText = '';
+            
+            for (let i = 0; i < parts.length; i++) {
+                if (i % 2 === 1) { // 代码块
+                    formattedText += `<pre><code>${parts[i]}</code></pre>`;
+                } else {
+                    formattedText += parts[i];
+                }
+            }
+            
+            messageDiv.innerHTML = formattedText;
+        } else {
+            messageDiv.textContent = text;
+        }
+        
         chatHistory.appendChild(messageDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        
+        return messageDiv;
+    }
+
+    function updateMessage(messageElement, newText, newClass) {
+        if (newClass) {
+            messageElement.className = `message ${newClass}`;
+        }
+        messageElement.innerHTML = newText;
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
+    function testConnection() {
+        const message = addMessage("Testing connection to DeepSeek API...", 'ai loading');
+        
+        fetch('/api/test-connection')
+            .then(response => {
+                if (response.ok) {
+                    updateMessage(message, "✓ Connection successful! API is ready", 'ai success');
+                } else {
+                    updateMessage(message, "⚠️ Connection failed. Please try again later.", 'ai error');
+                }
+            })
+            .catch(error => {
+                updateMessage(message, `⚠️ Connection error: ${error.message}`, 'ai error');
+            });
+    }
+    function handleTranslationRequest(text, targetLanguage) {
+        const message = addMessage(`Translating to ${getLanguageName(targetLanguage)}...`, 'ai loading');
+        
+        fetch('/api/translate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ text, targetLanguage })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.translation) {
+                updateMessage(message, `Translation (${getLanguageName(targetLanguage)}): 
+                <div class="translation-result">${data.translation}</div>`, 'ai');
+            } else {
+                updateMessage(message, "Translation failed. Please try again.", 'ai error');
+            }
+        })
+        .catch(error => {
+            updateMessage(message, `Translation error: ${error.message}`, 'ai error');
+        });
+    }
+
+    // 获取当前语言
+    function getCurrentLanguage() {
+    return localStorage.getItem('preferredLanguage') || 'en';
+    }
+
+    // 获取语言名称
+    function getLanguageName(code) {
+        const languages = {
+            'en': 'English',
+            'zh': '中文',
+            'es': 'Spanish',
+            'fr': 'French'
+        };
+        return languages[code] || code;
+    }
+    // 历史记录功能 
+    function saveToHistory(question, answer) {
+        const history = JSON.parse(localStorage.getItem('aiChatHistory') || '[]');
+        history.push({
+            question,
+            answer,
+            timestamp: new Date().toISOString()
+        });
+        
+        // 只保留最近的20条记录
+        if (history.length > 20) history.shift();
+        
+        localStorage.setItem('aiChatHistory', JSON.stringify(history));
+    }
+
+    function getChatHistory() {
+        return JSON.parse(localStorage.getItem('aiChatHistory') || '[]');
+    }
+
+    function getChatContext() {
+        const history = getChatHistory();
+        return history.map(item => 
+            `User: ${item.question}\nAssistant: ${item.answer}`
+        ).join('\n\n');
+    }
+
+    // 初始化时加载历史记录
+    function loadChatHistory() {
+        const history = getChatHistory();
+        if (history.length > 0) {
+            history.forEach(item => {
+                addMessage(item.question, 'user');
+                addMessage(item.answer, 'ai');
+            });
+        } else {
+            addMessage("Hello! I'm your Water Culture Assistant. Ask me about Qianjinbei, Tang Xianzu, or Jiangxi water culture.", 'ai');
+        }
+    }
+
+        // 修改词汇点击事件
+    document.querySelectorAll('.vocab-word').forEach(word => {
+        word.addEventListener('click', function() {
+            const term = this.dataset.word;
+            const targetLanguage = getCurrentLanguage() === 'zh' ? 'en' : 'zh';
+            
+            // 显示翻译器
+            vocabTranslator.classList.remove('hidden');
+            translatedWord.innerHTML = `<strong>${term}</strong>`;
+            aiExplanation.textContent = "Loading translation and explanation...";
+            
+            // 获取翻译和解释
+            fetch('/api/translate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    text: term,
+                    targetLanguage: targetLanguage,
+                    context: "water culture term"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.translation) {
+                    translatedWord.innerHTML = `<strong>${term}</strong>: ${data.translation}`;
+                    
+                    // 获取详细解释
+                    return fetch('/api/ai-answer', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ 
+                            prompt: `Explain the term "${term}" in the context of Jiangxi water culture in 1-2 sentences.`,
+                            language: getCurrentLanguage()
+                        })
+                    });
+                } else {
+                    aiExplanation.textContent = "Translation not available.";
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.answer) {
+                    aiExplanation.textContent = data.answer;
+                }
+            })
+            .catch(error => {
+                aiExplanation.textContent = "Could not load explanation.";
+            });
+        });
+    });
     // 词汇翻译功能
     const vocabTranslator = document.querySelector('.vocab-translator');
     const closeTranslator = document.querySelector('.close-translator');
@@ -251,33 +493,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 绑定词汇点击事件
-    document.querySelectorAll('.vocab-word').forEach(word => {
-        word.addEventListener('click', function() {
-            const term = this.dataset.word;
-            translatedWord.innerHTML = `<strong>${term}</strong>: ${vocabDictionary[term]}`;
+    // document.querySelectorAll('.vocab-word').forEach(word => {
+    //     word.addEventListener('click', function() {
+    //         // 移除之前激活的词汇
+    //         document.querySelectorAll('.vocab-word').forEach(w => {
+    //             w.classList.remove('active');
+    //         });
+    //         // 添加当前激活状态
+    //         this.classList.add('active');
+    //         const term = this.dataset.word;
+    //         translatedWord.innerHTML = `<strong>${term}</strong>: ${vocabDictionary[term]}`;
             
-            // 显示AI解释
-            aiExplanation.textContent = "Loading explanation...";
-            vocabTranslator.classList.remove('hidden');
+    //         // 显示AI解释
+    //         aiExplanation.textContent = "Loading explanation...";
+    //         vocabTranslator.classList.remove('hidden');
             
-            // 获取AI解释
-            fetch('/api/ai-answer', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    prompt: `Explain the term "${term}" in the context of Jiangxi water culture in 1-2 sentences.`
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.answer) {
-                    aiExplanation.textContent = data.answer;
-                } else {
-                    aiExplanation.textContent = "Could not load explanation.";
-                }
-            });
-        });
-    });
+    //         // 获取AI解释
+    //         fetch('/api/ai-answer', {
+    //             method: 'POST',
+    //             headers: {'Content-Type': 'application/json'},
+    //             body: JSON.stringify({ 
+    //                 prompt: `Explain the term "${term}" in the context of Jiangxi water culture in 1-2 sentences.`
+    //             })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.answer) {
+    //                 aiExplanation.textContent = data.answer;
+    //             } else {
+    //                 aiExplanation.textContent = "Could not load explanation.";
+    //             }
+    //         });
+    //     });
+    // });
 
     if (closeTranslator) {
         closeTranslator.addEventListener('click', () => {
@@ -285,17 +533,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 修改Ask AI按钮事件
     if (askAiBtn) {
         askAiBtn.addEventListener('click', () => {
             const term = document.querySelector('.vocab-word.active')?.dataset.word;
             if (term) {
                 aiChatbox.classList.remove('hidden');
                 aiQuestionInput.value = `Tell me more about ${term} in Jiangxi water culture`;
-                sendQuestion();
+                // 添加延迟确保输入框可见
+                setTimeout(() => {
+                    aiQuestionInput.focus();
+                }, 300);
             }
         });
     }
-
     // 翻译游戏功能
     const gameOptions = document.querySelectorAll('.options button');
     const gameFeedback = document.getElementById('game-feedback');
@@ -328,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // 检查游戏完成状态
-            if (correctAnswers === 6) {
+            if (correctAnswers === 3) {
                 gameFeedback.classList.remove('hidden');
                 gameFeedback.innerHTML = `
                     <div class="success-message">✓ Excellent! You found all incorrect translations</div>
@@ -407,16 +658,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const panoramaImg = document.querySelector('.panorama-img');
 
     if (panLeftBtn && panRightBtn) {
+        // 修改全景图控制逻辑
         let panPosition = 0;
-        
-        panLeftBtn.addEventListener('click', () => {
-            panPosition = Math.max(panPosition - 20, 0);
-            panoramaImg.style.transform = `translateX(${panPosition}px)`;
-        });
-        
-        panRightBtn.addEventListener('click', () => {
-            panPosition = Math.min(panPosition + 20, 100);
-            panoramaImg.style.transform = `translateX(${panPosition}px)`;
-        });
-    }
+            const maxPan = panoramaImg.width - panoramaImg.parentElement.clientWidth;
+
+            panLeftBtn.addEventListener('click', () => {
+                panPosition = Math.max(panPosition - 50, 0);
+                panoramaImg.style.transform = `translateX(-${panPosition}px)`;
+            });
+
+            panRightBtn.addEventListener('click', () => {
+                panPosition = Math.min(panPosition + 50, maxPan);
+                panoramaImg.style.transform = `translateX(-${panPosition}px)`;
+            });
+        }
+
+
+    loadChatHistory();
+    // 设置首选语言
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && languageSelect) {
+        languageSelect.value = savedLanguage;
+}
 });
