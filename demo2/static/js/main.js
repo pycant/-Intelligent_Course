@@ -155,8 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // static/js/main.js 新增功能
-    // 在DOMContentLoaded事件内添加以下代码
 
     // AI问答功能
     let isDragging = false;
@@ -208,13 +206,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
+    // 修改AI助手显示/隐藏功能
     if (aiToggle) {
         aiToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             aiChatbox.classList.toggle('hidden');
-            aiChatbox.classList.add('active');
-            document.querySelector('.ai-chatbox .chat-input input').focus();
+            
+            if (!aiChatbox.classList.contains('hidden')) {
+                // 显示时添加动画类
+                aiChatbox.classList.add('show');
+                // 延迟设置焦点确保元素可见
+                setTimeout(() => {
+                    aiQuestionInput.focus();
+                }, 100);
+            } else {
+                aiChatbox.classList.remove('show');
+            }
         });
     }
 
@@ -253,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // 添加等待消息
-        const waitingMsg = addMessage("Thinking...", 'ai loading');
+        const waitingMsg = addMessage("Thinking...", 'ai-loading');
         
         // 发送到AI API
         fetch('/api/ai-answer', {
@@ -284,26 +291,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 改进的消息添加函数
+    // 改进消息处理函数
     function addMessage(text, sender) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', sender);
+        messageDiv.classList.add('message', sender.replace(' ', '-'));
         
-        // 格式化AI响应
+        // 安全处理HTML内容
         if (sender.startsWith('ai') && text.includes('```')) {
             const parts = text.split('```');
             let formattedText = '';
             
             for (let i = 0; i < parts.length; i++) {
                 if (i % 2 === 1) { // 代码块
-                    formattedText += `<pre><code>${parts[i]}</code></pre>`;
+                    formattedText += `<pre><code>${escapeHtml(parts[i])}</code></pre>`;
                 } else {
-                    formattedText += parts[i];
+                    formattedText += escapeHtml(parts[i]);
                 }
             }
             
             messageDiv.innerHTML = formattedText;
         } else {
+            // 安全转义HTML
             messageDiv.textContent = text;
         }
         
@@ -311,6 +319,16 @@ document.addEventListener('DOMContentLoaded', function() {
         chatHistory.scrollTop = chatHistory.scrollHeight;
         
         return messageDiv;
+    }
+
+    // HTML转义函数
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function updateMessage(messageElement, newText, newClass) {
@@ -322,18 +340,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function testConnection() {
-        const message = addMessage("Testing connection to DeepSeek API...", 'ai loading');
+        const message = addMessage("Testing connection to DeepSeek API...", 'ai-loading');
         
         fetch('/api/test-connection')
             .then(response => {
                 if (response.ok) {
-                    updateMessage(message, "✓ Connection successful! API is ready", 'ai success');
+                    updateMessage(message, "✓ Connection successful! API is ready", 'ai-success');
                 } else {
                     updateMessage(message, "⚠️ Connection failed. Please try again later.", 'ai error');
                 }
             })
             .catch(error => {
-                updateMessage(message, `⚠️ Connection error: ${error.message}`, 'ai error');
+                updateMessage(message, `⚠️ Connection error: ${error.message}`, 'ai-error');
             });
     }
     function handleTranslationRequest(text, targetLanguage) {
@@ -477,7 +495,13 @@ document.addEventListener('DOMContentLoaded', function() {
         "Tang Xianzu": "汤显祖 (Ming Dynasty playwright)",
         "irrigation": "灌溉 (Watering crops)",
         "hydraulic": "水利的 (Related to water engineering)",
-        "cultural": "文化的 (Related to culture and arts)"
+        "cultural": "文化的 (Related to culture and arts)",
+        "Fushui": "抚水 (River in Jiangxi)",
+        "dam": "水坝 (Water barrier structure)",
+        "heritage": "遗产 (Cultural inheritance)",
+        "flood": "洪水 (Water overflow)",
+        "navigation": "航运 (Water transportation)",
+        "engineering": "工程 (Technical application)"
     };
 
     // 标记页面中的专业术语
@@ -533,24 +557,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 修改Ask AI按钮事件
+    // 修复Ask AI按钮事件
     if (askAiBtn) {
         askAiBtn.addEventListener('click', () => {
-            const term = document.querySelector('.vocab-word.active')?.dataset.word;
-            if (term) {
+            const activeWord = document.querySelector('.vocab-word.active');
+            if (activeWord) {
+                const term = activeWord.dataset.word;
                 aiChatbox.classList.remove('hidden');
-                aiQuestionInput.value = `Tell me more about ${term} in Jiangxi water culture`;
-                // 添加延迟确保输入框可见
+                aiChatbox.classList.add('show');
+                
+                // 设置问题并触发发送
+                aiQuestionInput.value = `请详细解释 ${term} 在江西水文化中的意义`;
                 setTimeout(() => {
                     aiQuestionInput.focus();
+                    sendQuestion();
                 }, 300);
             }
         });
     }
+
     // 翻译游戏功能
     const gameOptions = document.querySelectorAll('.options button');
     const gameFeedback = document.getElementById('game-feedback');
     let correctAnswers = 0;
+    const totalQuestions = document.querySelectorAll('.poem-excerpt').length;
+
+    // 重置游戏状态函数
+    function resetGame() {
+        correctAnswers = 0;
+        gameFeedback.classList.add('hidden');
+        
+        // 重置所有选项
+        document.querySelectorAll('.options button').forEach(btn => {
+            btn.disabled = false;
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+        });
+    }    
+    // 在游戏开始时调用重置
+    resetGame();
 
     gameOptions.forEach(option => {
         option.addEventListener('click', function() {
@@ -579,15 +624,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // 检查游戏完成状态
-            if (correctAnswers === 3) {
+            if (correctAnswers === totalQuestions) {
                 gameFeedback.classList.remove('hidden');
                 gameFeedback.innerHTML = `
-                    <div class="success-message">✓ Excellent! You found all incorrect translations</div>
-                    <p>Tang Xianzu's poetry captures the essence of water culture in Jiangxi.</p>
+                    <div class="success-message">✓ 太棒了！您找到了所有翻译错误</div>
+                    <p>汤显祖的诗歌捕捉了江西水文化的精髓。</p>
+                    <button id="play-again">再玩一次</button>
                 `;
+                
+                // 添加再玩一次按钮事件
+                document.getElementById('play-again').addEventListener('click', resetGame);
             }
         });
     });
+
 
     // 知识检验功能
     const quizForm = document.getElementById('quiz-form');
@@ -596,7 +646,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (quizForm) {
         quizForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+    
+            // 重置结果
+            document.getElementById('mc-score').textContent = '0';
+            document.getElementById('tf-score').textContent = '0';
             // 计算选择题和判断题分数
             let mcScore = 0;
             let tfScore = 0;
@@ -649,6 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 显示结果
             quizResults.classList.remove('hidden');
+            quizResults.scrollIntoView({ behavior: 'smooth' });
         });
     }
 
@@ -657,21 +711,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const panRightBtn = document.querySelector('.pan-right');
     const panoramaImg = document.querySelector('.panorama-img');
 
-    if (panLeftBtn && panRightBtn) {
-        // 修改全景图控制逻辑
+    // 修复全景图控制逻辑
+    if (panLeftBtn && panRightBtn && panoramaImg) {
         let panPosition = 0;
-            const maxPan = panoramaImg.width - panoramaImg.parentElement.clientWidth;
-
-            panLeftBtn.addEventListener('click', () => {
-                panPosition = Math.max(panPosition - 50, 0);
-                panoramaImg.style.transform = `translateX(-${panPosition}px)`;
-            });
-
-            panRightBtn.addEventListener('click', () => {
-                panPosition = Math.min(panPosition + 50, maxPan);
-                panoramaImg.style.transform = `translateX(-${panPosition}px)`;
-            });
+        let maxPan = 0;
+        
+        // 等待图片加载完成后再计算最大平移量
+        panoramaImg.onload = function() {
+            maxPan = this.width - this.parentElement.clientWidth;
+        };
+        
+        // 如果图片已加载，立即计算
+        if (panoramaImg.complete) {
+            maxPan = panoramaImg.width - panoramaImg.parentElement.clientWidth;
         }
+        
+        panLeftBtn.addEventListener('click', () => {
+            panPosition = Math.max(panPosition - 100, 0);
+            panoramaImg.style.transform = `translateX(-${panPosition}px)`;
+        });
+        
+        panRightBtn.addEventListener('click', () => {
+            panPosition = Math.min(panPosition + 100, maxPan);
+            panoramaImg.style.transform = `translateX(-${panPosition}px)`;
+        });
+    }
 
 
     loadChatHistory();
@@ -680,4 +744,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedLanguage && languageSelect) {
         languageSelect.value = savedLanguage;
 }
+    // 添加窗口大小变化时的处理
+    window.addEventListener('resize', () => {
+        // 调整AI聊天框位置
+        if (!aiChatbox.classList.contains('hidden')) {
+            const rect = aiChatbox.getBoundingClientRect();
+            const maxX = window.innerWidth - aiChatbox.offsetWidth;
+            const maxY = window.innerHeight - aiChatbox.offsetHeight;
+            
+            aiChatbox.style.left = `${Math.max(0, Math.min(parseInt(aiChatbox.style.left) || 0, maxX))}px`;
+            aiChatbox.style.top = `${Math.max(0, Math.min(parseInt(aiChatbox.style.top) || 0, maxY))}px`;
+        }
+        
+        // 重置全景图最大平移量
+        if (panoramaImg) {
+            maxPan = panoramaImg.width - panoramaImg.parentElement.clientWidth;
+        }
+    });
+
 });
+

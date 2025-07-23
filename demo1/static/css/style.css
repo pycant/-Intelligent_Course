@@ -351,3 +351,33 @@ body {
         top: 0;
     }
 }
+
+@media (max-width: 768px) {
+    .ai-chatbox {
+        width: 90vw;
+        height: 70vh;
+        right: 5vw;
+        left: 5vw;
+    }
+    
+    .simulator-container canvas {
+        width: 100%;
+        height: auto;
+        
+    }
+}
+
+@media (max-width: 600px) {
+    .timeline-container {
+        flex-direction: column;
+    }
+    
+    .timeline-event {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-container::before {
+        display: none;
+    }
+}

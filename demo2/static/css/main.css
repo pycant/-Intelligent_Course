@@ -709,3 +709,5 @@ pre code {
     font-size: 12px;
     cursor: pointer;
 }
+.ai-loading { background: #fff3e0; }
+.ai-error { color: #c62828; }
