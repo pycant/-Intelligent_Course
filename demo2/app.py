@@ -5,6 +5,7 @@ import time
 import json
 from googletrans import Translator
 
+
 app = Flask(__name__)
 DEEPSEEK_API_KEY = "sk-f5aa3e02b1c94e0899b9423b69ef6a48"
 
