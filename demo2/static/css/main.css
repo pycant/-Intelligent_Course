@@ -711,3 +711,114 @@ pre code {
 }
 .ai-loading { background: #fff3e0; }
 .ai-error { color: #c62828; }
+
+/* 新增图片样式 */
+.event-card img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover; /* 改为 cover 确保图片填充 */
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 2px solid #e6c567;
+    display: block; /* 修复 flex 布局问题 */
+}
+
+/* 更新时间线样式 */
+.timeline-event {
+    position: relative;
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    border-left: 4px solid #d4af37;
+}
+
+.timeline-event:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* 新增背景样式 */
+section {
+    width: 92vw;
+    height: 90vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.section-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1200px;
+    background-color: rgba(255, 255, 255, 0.92);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    z-index: 10;
+}
+
+/* 新增导航按钮样式 */
+.floating-nav {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: #1a645c;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 新增章节标题样式 */
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #1a645c;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: #d4af37;
+    border-radius: 2px;
+}
+
+/* 修复拖拽区域 */
+.drag-target {
+    min-height: 180px;
+    position: relative;
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 1px dashed #d4af37;
+}
